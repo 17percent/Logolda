@@ -1,0 +1,2 @@
+# Logolda
+szakdoga repo
