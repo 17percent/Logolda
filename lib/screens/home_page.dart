@@ -1,4 +1,5 @@
 // HomePage widget that displays the user's tasks in categorized sections
+// and allows the user to navigate to the details page of a task
 
 import 'package:flutter/material.dart';
 import 'package:logolda/util/colors.dart';
