@@ -5,6 +5,7 @@ import 'package:logolda/screens/home_page.dart';
 import 'package:logolda/screens/login_page.dart';
 import 'package:logolda/screens/profile_page.dart';
 import 'package:logolda/screens/register_page.dart';
+import 'package:logolda/screens/archive_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,7 +30,8 @@ class MyApp extends StatelessWidget {
         '/home': (context) => const HomePage(),
         '/signup': (context) => const SignupPage(),
         '/profile': (context) => const ProfilePage(),
-        '/create': (context) => const AddTaskPage()
+        '/create': (context) => const AddTaskPage(),
+        '/archive': (context) => const ArchivePage(),
       },
     );
   }

@@ -15,7 +15,7 @@ class _ModifyPageState extends State<ModifyPage> {
   final _formKey = GlobalKey<FormState>();
   final _firestore = FirebaseFirestore.instance;
   var _categories = [];
-  var _difficulties = [];
+  Map<String, int> _difficultiesAndScores = {};
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
@@ -32,7 +32,7 @@ class _ModifyPageState extends State<ModifyPage> {
   void initState() {
     super.initState();
     fetchCategories();
-    fetchDifficulties();
+    fetchDifficultiesAndScores();
     _loadTaskData();
   }
 
@@ -137,13 +137,19 @@ class _ModifyPageState extends State<ModifyPage> {
     }
   }
 
-  Future<void> fetchDifficulties() async {
+  Future<void> fetchDifficultiesAndScores() async {
     try {
       final QuerySnapshot snapshot =
           await FirebaseFirestore.instance.collection('Difficulties').get();
       setState(() {
-        _difficulties =
-            snapshot.docs.map((doc) => doc['name'] as String).toList();
+        _difficultiesAndScores = {
+          for (var doc in snapshot.docs) doc['name']: doc['value']
+        };
+        // sorting the map by value
+        _difficultiesAndScores = Map.fromEntries(
+          _difficultiesAndScores.entries.toList()
+            ..sort((e1, e2) => e1.value.compareTo(e2.value)),
+        );
         _isLoadingDifficulties = false; // Update loading state
       });
     } catch (e) {
@@ -236,7 +242,7 @@ class _ModifyPageState extends State<ModifyPage> {
                     color: AppColors.coolGrey,
                     size: 50,
                   ),
-                  items: _difficulties
+                    items: _difficultiesAndScores.keys
                       .map<DropdownMenuItem<String>>((dynamic diff) {
                     return DropdownMenuItem<String>(
                       value: diff,

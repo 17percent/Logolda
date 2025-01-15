@@ -85,8 +85,11 @@ class _AddTaskPageState extends State<AddTaskPage> {
       final QuerySnapshot snapshot =
           await FirebaseFirestore.instance.collection('Difficulties').get();
       setState(() {
-        _difficulties =
-            snapshot.docs.map((doc) => doc['name'] as String).toList();
+        _difficulties = snapshot.docs
+            .map((doc) => {'name': doc['name'] as String, 'value': doc['value'] as int})
+            .toList();
+        _difficulties.sort((a, b) => a['value'].compareTo(b['value']));
+        _difficulties = _difficulties.map((item) => item['name'] as String).toList();
         _isLoadingDifficulties = false; // Update loading state
       });
     } catch (e) {

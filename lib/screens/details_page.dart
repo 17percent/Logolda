@@ -3,6 +3,7 @@ import 'package:logolda/screens/modify_page.dart';
 import 'package:logolda/util/colors.dart';
 import 'package:logolda/models/task.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:logolda/firebase/auth_handler.dart';
 
 class TaskDetailsPage extends StatefulWidget {
   const TaskDetailsPage({super.key, required this.task});
@@ -15,12 +16,14 @@ class TaskDetailsPage extends StatefulWidget {
 
 class _TaskDetailsPageState extends State<TaskDetailsPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
+  final AuthService _authService = AuthService();
+  Map<String, int> _difficultiesAndScores = {};
   late Task _task;
 
   @override
   void initState() {
     super.initState();
+    fetchDifficultiesAndScores();
     _task = widget.task;
   }
 
@@ -81,10 +84,9 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                 if (confirmDelete == true) {
                   await deleteTask(widget.task.id);
                   if (mounted) {
-                    // Taking user to Home page
-                    await Navigator.pushReplacementNamed(context, '/home');
-                    // Sending info to screen
-                    _showSnackBar("Sikeres törlés!");
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                      '/home', (Route<dynamic> route) => false);
+                  _showSnackBar("Sikeres törlés!");
                   }
                 }
               }),
@@ -95,8 +97,8 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
           return IconButton(
             icon: const Icon(Icons.arrow_circle_left_outlined,
                 size: 60, color: AppColors.antiFlashWhite),
-            onPressed: () async {
-              await Navigator.pushReplacementNamed(context, '/home');
+            onPressed: () {
+              Navigator.of(context).pop();
             },
             // Acessibility feature
             // tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
@@ -146,7 +148,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                 buildTaskDetailsContainer('Kategória ', _task.category),
                 buildTaskDetailsContainer('Nehézség ', _task.difficulty),
                 const SizedBox(height: 30),
-                buildActionButtons(),
+                if (!_task.isDone) buildActionButtons(),
               ],
             ),
           ],
@@ -165,7 +167,10 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
           decoration: customBoxDeoration(AppColors.springBud, 18),
           child: IconButton(
             icon: const Icon(Icons.check_circle_outline_rounded, size: 55),
-            onPressed: () {},
+            onPressed: () async {
+              await markTaskAsDone(widget.task.id);
+              await updateUserScore();
+            },
             style: ElevatedButton.styleFrom(
               fixedSize: const Size(90, 80),
             ),
@@ -190,13 +195,14 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                     id: widget.task.id,
                     title: result['title'],
                     description: result['description'],
-                    location: _task.location,
-                    startDate: _task.startDate,
-                    startTime: _task.startTime,
-                    dueDate: _task.dueDate,
-                    dueTime: _task.dueTime,
-                    category: _task.category,
-                    difficulty: _task.difficulty,
+                    location: result['location'],
+                    startDate: result['startDate'],
+                    startTime: result['startTime'],
+                    dueDate: result['dueDate'],
+                    dueTime: result['dueTime'],
+                    category: result['category'],
+                    difficulty: result['difficulty'],
+                    isDone: result['isDone'],
                   );
                 });
               }
@@ -218,6 +224,49 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
     }
   }
 
+  // Mark task as done
+  Future<void> markTaskAsDone(String taskId) async {
+    try {
+      await _firestore.collection('Tasks').doc(taskId).update({
+        'isDone': true,
+      });
+      if (mounted) {
+        Navigator.pushNamedAndRemoveUntil(
+            context, '/home', (Route<dynamic> route) => false);
+      }
+      _showSnackBar("Sikeres archiválás!");
+    } catch (e) {
+      _showSnackBar('Sikertelen archiválás: $e');
+    }
+  }
+
+  Future<void> updateUserScore() async {
+    final userid = _authService.getLoggedInUser()?.uid;
+    try {
+      await _firestore.collection('Users').doc(userid).update({
+        'seeds': FieldValue.increment(_difficultiesAndScores[_task.difficulty] as num),
+      });
+    } catch (e) {
+      _showSnackBar('Error updating user score: $e');
+    }
+  }
+
+  Future<void> fetchDifficultiesAndScores() async {
+    try {
+      final QuerySnapshot snapshot =
+          await FirebaseFirestore.instance.collection('Difficulties').get();
+      setState(() {
+        _difficultiesAndScores = {
+          for (var doc in snapshot.docs) doc['name']: doc['value']
+        };
+      });
+    } catch (e) {
+      _showSnackBar('Error fetching difficulties: $e');
+      setState(() {});
+    }
+  }
+
+  // Delete task
   Future<void> deleteTask(String id) async {
     try {
       await _firestore.collection('Tasks').doc(id).delete();

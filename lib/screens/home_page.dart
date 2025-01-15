@@ -45,6 +45,7 @@ class _HomePageState extends State<HomePage> {
       final querySnapshot = await _firestore
           .collection('Tasks')
           .where('uid', isEqualTo: userId)
+          .where('isDone', isEqualTo: false)
           .get();
       return querySnapshot.docs
           .map((doc) => Task.fromMap(doc.data(), doc.id))
@@ -169,11 +170,12 @@ class _HomePageState extends State<HomePage> {
         padding: EdgeInsets.zero,
         children: [
           _buildDrawerHeader(),
+          _buildDrawerItem('Események', Icons.home_rounded, () => Navigator.pushNamed(context, '/home')),
           _buildDrawerItem('Új esemény', Icons.task_rounded,
               () => Navigator.pushNamed(context, '/create')),
           _buildDrawerItem('Új kategória', Icons.category_rounded,
               () => Navigator.pop(context)),
-          _buildDrawerItem('Archívum', Icons.archive_rounded, () {}),
+          _buildDrawerItem('Archívum', Icons.archive_rounded, () => Navigator.pushNamed(context, '/archive')),
           _buildDrawerItem('Eredménytábla', Icons.leaderboard_rounded, () {}),
           _buildDrawerItem('Kijelentkezés', Icons.logout_rounded, () {
             _authService.signOut();

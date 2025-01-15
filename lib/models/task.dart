@@ -9,6 +9,7 @@ class Task {
   final String? dueTime;
   final String category;
   final String difficulty;
+  final bool isDone;
 
   Task({
     required this.id,
@@ -20,7 +21,8 @@ class Task {
     required this.dueDate,
     required this.dueTime,
     required this.category,
-    required this.difficulty
+    required this.difficulty,
+    required this.isDone,
   });
 
   // Factory method to create a Task from Firestore data
@@ -35,7 +37,8 @@ class Task {
       dueDate: map['dueDate'],
       dueTime: map['dueTime'],
       category: map['category'],
-      difficulty: map['difficulty']
+      difficulty: map['difficulty'],
+      isDone: map['isDone'],
     );
   }
 }
