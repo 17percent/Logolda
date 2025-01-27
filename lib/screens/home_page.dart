@@ -302,7 +302,7 @@ class _TaskCategorySectionState extends State<TaskCategorySection> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => TaskDetailsPage(task: task)),
+                            builder: (context) => TaskDetailsPage(task: task, title: widget.title)),
                       );
                     },
                   ),

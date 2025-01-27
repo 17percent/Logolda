@@ -242,7 +242,7 @@ Container customContainerForArchivedTasks(Task task, BuildContext context) {
           Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => TaskDetailsPage(task: task)),
+                builder: (context) => TaskDetailsPage(task: task, title: "Kész",)),
           );
         },
       ),

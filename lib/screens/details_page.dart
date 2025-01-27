@@ -6,9 +6,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:logolda/firebase/auth_handler.dart';
 
 class TaskDetailsPage extends StatefulWidget {
-  const TaskDetailsPage({super.key, required this.task});
+  const TaskDetailsPage({super.key, required this.task, required this.title});
 
   final Task task;
+  final String title;
 
   @override
   State<TaskDetailsPage> createState() => _TaskDetailsPageState();
@@ -19,12 +20,14 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
   final AuthService _authService = AuthService();
   Map<String, int> _difficultiesAndScores = {};
   late Task _task;
+  late String _title;
 
   @override
   void initState() {
     super.initState();
     fetchDifficultiesAndScores();
     _task = widget.task;
+    _title = widget.title;
   }
 
   @override
@@ -84,9 +87,9 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                 if (confirmDelete == true) {
                   await deleteTask(widget.task.id);
                   if (mounted) {
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                      '/home', (Route<dynamic> route) => false);
-                  _showSnackBar("Sikeres törlés!");
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                        '/home', (Route<dynamic> route) => false);
+                    _showSnackBar("Sikeres törlés!");
                   }
                 }
               }),
@@ -115,10 +118,10 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                 alignment: Alignment.center,
                 padding: const EdgeInsets.only(bottom: 10),
                 margin: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   border: Border(
                     bottom:
-                        BorderSide(color: AppColors.antiFlashWhite, width: 2),
+                        BorderSide(color: getColorBasedOnStatus(_title), width: 2),
                   ),
                 ),
                 child: Text(_task.title,
@@ -244,7 +247,8 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
     final userid = _authService.getLoggedInUser()?.uid;
     try {
       await _firestore.collection('Users').doc(userid).update({
-        'seeds': FieldValue.increment(_difficultiesAndScores[_task.difficulty] as num),
+        'seeds': FieldValue.increment(
+            _difficultiesAndScores[_task.difficulty] as num),
       });
     } catch (e) {
       _showSnackBar('Error updating user score: $e');
@@ -276,30 +280,38 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
   }
 }
 
-Container buildTaskDetailsContainer(String title, String value) {
+Container buildTaskDetailsContainer(String taskTitle, String value) {
   return Container(
     margin: const EdgeInsets.all(10),
-    padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
-    decoration: customBoxDeoration(AppColors.antiFlashWhite, 8),
+    padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+    decoration: customBoxDeoration(AppColors.coolGrey, 8),
     child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Container(
-          padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-          decoration: const BoxDecoration(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(8),
-              bottomLeft: Radius.circular(8),
+        Text(taskTitle,
+            style:
+                const TextStyle(fontSize: 16, color: AppColors.antiFlashWhite),
+            softWrap: true,
+            overflow: TextOverflow.visible),
+        const SizedBox(width: 15),
+        Expanded(
+          child: Container(
+            padding: const EdgeInsets.all(10),
+            decoration: const BoxDecoration(
+              color: AppColors.antiFlashWhite,
+              borderRadius: BorderRadius.only(
+                topRight: Radius.circular(8),
+                bottomRight: Radius.circular(8),
+              ),
             ),
-            color: AppColors.coolGrey,
+            alignment: Alignment.centerRight,
+            child: Text(value,
+                style:
+                    const TextStyle(fontSize: 16, color: AppColors.spaceCadet),
+                softWrap: true,
+                overflow: TextOverflow.visible,
+                textAlign: TextAlign.right),
           ),
-          child: Text(title,
-              style: const TextStyle(
-                  fontSize: 16, color: AppColors.antiFlashWhite)),
         ),
-        const SizedBox(width: 10),
-        Text(value,
-            style: const TextStyle(fontSize: 16, color: AppColors.spaceCadet)),
       ],
     ),
   );
@@ -319,4 +331,21 @@ BoxDecoration customBoxDeoration(Color color, double radius) {
       )
     ],
   );
+}
+
+Color getColorBasedOnStatus(String status) {
+  switch (status) {
+    case 'Esedékes':
+      return AppColors.amethystPurple;
+    case 'Közelgő':
+      return AppColors.goldYellow;
+    case 'Függő':
+      return AppColors.orangePeel;
+    case 'Lejárt':
+      return AppColors.pantoneRed;
+    case 'Kész':
+      return AppColors.springBud;
+    default:
+      return AppColors.antiFlashWhite;
+  }
 }
