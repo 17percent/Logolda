@@ -90,11 +90,7 @@ class _ArchivePageState extends State<ArchivePage> {
   AppBar _buildAppBar() {
     return AppBar(
       actions: [
-        IconButton(
-          icon: const Icon(Icons.account_circle,
-              color: AppColors.antiFlashWhite, size: 60),
-          onPressed: () => Navigator.pushNamed(context, '/profile'),
-        ),
+        // Info button is needed
       ],
       backgroundColor: AppColors.coolGrey,
       toolbarHeight: 80,

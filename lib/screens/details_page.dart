@@ -120,8 +120,8 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                 margin: const EdgeInsets.fromLTRB(10, 0, 10, 10),
                 decoration: BoxDecoration(
                   border: Border(
-                    bottom:
-                        BorderSide(color: getColorBasedOnStatus(_title), width: 2),
+                    bottom: BorderSide(
+                        color: getColorBasedOnStatus(_title), width: 2),
                   ),
                 ),
                 child: Text(_task.title,

@@ -4,7 +4,9 @@ import 'package:logolda/firebase/auth_handler.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
+  const ProfilePage({super.key, this.categorizedTasksAmount = const {}});
+
+  final Map<String, int> categorizedTasksAmount;
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -13,12 +15,13 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   final AuthService _authService = AuthService();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  // User stats | result of database queries
-  int? dueTasksAmount;
-  int? upcomingTasksAmount;
-  int? pendingTasksAmount;
-  int? expiredTasksAmount;
-  int? doneTasksAmount;
+  late Map<String, int> _categorizedTasksAmount;
+
+  @override
+  void initState() {
+    super.initState();
+    _categorizedTasksAmount = widget.categorizedTasksAmount;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,90 +72,111 @@ class _ProfilePageState extends State<ProfilePage> {
               return Container(
                 margin: const EdgeInsets.all(16),
                 padding: const EdgeInsets.only(top: 30),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                child: Column(
                   children: [
-                    Column(children: [
-                      const Icon(Icons.account_circle,
-                          color: AppColors.antiFlashWhite, size: 140),
-                      const SizedBox(height: 10),
-                      Text(
-                        '${userData['name']}',
-                        style: const TextStyle(
-                            fontSize: 24, color: AppColors.antiFlashWhite),
-                      ),
-                    ]),
-                    const SizedBox(width: 50),
-                    Column(
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text(
-                          'Rank',
-                          style: TextStyle(
-                              color: AppColors.antiFlashWhite, fontSize: 20),
-                        ),
-                        const SizedBox(height: 10),
-                        Container(
-                          alignment: Alignment.center,
-                          width: 150,
-                          padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            color: AppColors.antiFlashWhite,
-                            boxShadow: [
-                              BoxShadow(
-                                blurRadius: 10,
-                                blurStyle: BlurStyle.normal,
-                                color: Colors.black.withOpacity(0.8),
-                                offset: const Offset(0, 5),
-                                spreadRadius: 0,
-                              )
-                            ],
-                          ),
-                          child: Text(
-                            '${userData['rank']}',
+                        Column(children: [
+                          const Icon(Icons.account_circle,
+                              color: AppColors.antiFlashWhite, size: 140),
+                          const SizedBox(height: 10),
+                          Text(
+                            '${userData['name']}',
                             style: const TextStyle(
-                                color: AppColors.spaceCadet, fontSize: 20),
+                                fontSize: 24, color: AppColors.antiFlashWhite),
                           ),
-                        ),
-                        const SizedBox(height: 20),
-                        const Text(
-                          'Seeds',
-                          style: TextStyle(
-                              color: AppColors.antiFlashWhite, fontSize: 20),
-                        ),
-                        const SizedBox(height: 10),
-                        Container(
-                          width: 150,
-                          alignment: Alignment.center,
-                          padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            color: AppColors.antiFlashWhite,
-                            boxShadow: [
-                              BoxShadow(
-                                blurRadius: 10,
-                                blurStyle: BlurStyle.normal,
-                                color: Colors.black.withOpacity(0.8),
-                                offset: const Offset(0, 5),
-                                spreadRadius: 0,
-                              )
-                            ],
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(Icons.spa_rounded, color: AppColors.coolGrey),
-                              const SizedBox(width: 5),
-                              Text(
-                                '${userData['seeds']}',
+                        ]),
+                        const SizedBox(width: 50),
+                        Column(
+                          children: [
+                            const Text(
+                              'Rank',
+                              style: TextStyle(
+                                  color: AppColors.antiFlashWhite,
+                                  fontSize: 20),
+                            ),
+                            const SizedBox(height: 10),
+                            Container(
+                              alignment: Alignment.center,
+                              width: 150,
+                              padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                color: AppColors.antiFlashWhite,
+                                boxShadow: [
+                                  BoxShadow(
+                                    blurRadius: 10,
+                                    blurStyle: BlurStyle.normal,
+                                    color: Colors.black.withOpacity(0.8),
+                                    offset: const Offset(0, 5),
+                                    spreadRadius: 0,
+                                  )
+                                ],
+                              ),
+                              child: Text(
+                                '${userData['rank']}',
                                 style: const TextStyle(
                                     color: AppColors.spaceCadet, fontSize: 20),
                               ),
-                            ],
-                          ),
-                        ),
+                            ),
+                            const SizedBox(height: 20),
+                            const Text(
+                              'Seeds',
+                              style: TextStyle(
+                                  color: AppColors.antiFlashWhite,
+                                  fontSize: 20),
+                            ),
+                            const SizedBox(height: 10),
+                            Container(
+                              width: 150,
+                              alignment: Alignment.center,
+                              padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                color: AppColors.antiFlashWhite,
+                                boxShadow: [
+                                  BoxShadow(
+                                    blurRadius: 10,
+                                    blurStyle: BlurStyle.normal,
+                                    color: Colors.black.withOpacity(0.8),
+                                    offset: const Offset(0, 5),
+                                    spreadRadius: 0,
+                                  )
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(Icons.spa_rounded,
+                                      color: AppColors.coolGrey),
+                                  const SizedBox(width: 5),
+                                  Text(
+                                    '${userData['seeds']}',
+                                    style: const TextStyle(
+                                        color: AppColors.spaceCadet,
+                                        fontSize: 20),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        )
                       ],
-                    )
+                    ),
+                    const SizedBox(height: 30),
+                    const Divider(
+                      color: AppColors.antiFlashWhite,
+                      thickness: 2,
+                    ),
+                    const SizedBox(height: 30),
+                    const Text(
+                      'Feladatok',
+                      style: TextStyle(
+                          color: AppColors.antiFlashWhite, fontSize: 24),
+                    ),
+                    const SizedBox(height: 20),
+                    buildTaskRows(_categorizedTasksAmount),
                   ],
                 ),
               );
@@ -163,5 +187,65 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
       ),
     );
+  }
+}
+
+Widget buildTaskRows(Map<String, int> tasks) {
+  return Column(
+    children: tasks.entries.map((entry) {
+      return Container(
+        margin: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: getColorBasedOnStatus(entry.key),
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: [
+            BoxShadow(
+              blurRadius: 10,
+              blurStyle: BlurStyle.normal,
+              color: Colors.black.withOpacity(0.8),
+              offset: const Offset(0, 5),
+              spreadRadius: 0,
+            )
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              entry.key,
+              style: const TextStyle(
+                color: AppColors.spaceCadet,
+                fontSize: 18,
+              ),
+            ),
+            Text(
+              entry.value.toString(),
+              style: const TextStyle(
+                color: AppColors.spaceCadet,
+                fontSize: 18,
+              ),
+            ),
+          ],
+        ),
+      );
+    }).toList(),
+  );
+}
+
+Color getColorBasedOnStatus(String status) {
+  switch (status) {
+    case 'Esedékes':
+      return AppColors.amethystPurple;
+    case 'Közelgő':
+      return AppColors.goldYellow;
+    case 'Függő':
+      return AppColors.orangePeel;
+    case 'Lejárt':
+      return AppColors.pantoneRed;
+    case 'Kesz':
+      return AppColors.springBud;
+    default:
+      return AppColors.antiFlashWhite;
   }
 }

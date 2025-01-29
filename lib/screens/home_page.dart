@@ -2,6 +2,7 @@
 // and allows the user to navigate to the details page of a task
 
 import 'package:flutter/material.dart';
+import 'package:logolda/screens/profile_page.dart';
 import 'package:logolda/util/colors.dart';
 import 'package:logolda/firebase/auth_handler.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -22,6 +23,13 @@ class _HomePageState extends State<HomePage> {
 
   late Future<List<Task>> _userTasks;
   late Map<String, List<Task>> _categorizedTasks = {};
+  final Map<String, int> _categorizedTasksAmount = {
+    'Esedékes': 0,
+    'Közelgő': 0,
+    'Függő': 0,
+    'Lejárt': 0,
+    'Kesz': 0,
+  };
 
   @override
   void initState() {
@@ -30,14 +38,22 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<List<Task>> _fetchAndCategorizeUserTasks() async {
-    final userId = _authService.getLoggedInUser()?.uid;
+    final userId =
+        _authService.getLoggedInUser()?.uid; // Get the current user's ID
     if (userId == null) return [];
 
-    final tasks = await _fetchUserTasks(userId);
+    final tasks = await _fetchUserTasks(userId); // Fetch the user's tasks
     setState(() {
-      _categorizedTasks = _categorizeTasksByDate(tasks);
+      _categorizedTasks = _categorizeTasksByDate(tasks); // Categorize the tasks
     });
+    _updateCategorizedTasksAmount();
     return tasks;
+  }
+
+  Future _updateCategorizedTasksAmount() async {
+    for (var entry in _categorizedTasks.entries) {
+      _categorizedTasksAmount[entry.key] = entry.value.length;
+    }
   }
 
   Future<List<Task>> _fetchUserTasks(String userId) async {
@@ -45,7 +61,6 @@ class _HomePageState extends State<HomePage> {
       final querySnapshot = await _firestore
           .collection('Tasks')
           .where('uid', isEqualTo: userId)
-          .where('isDone', isEqualTo: false)
           .get();
       return querySnapshot.docs
           .map((doc) => Task.fromMap(doc.data(), doc.id))
@@ -66,6 +81,7 @@ class _HomePageState extends State<HomePage> {
     final threeDaysLaterTasks = <Task>[];
     final futureTasks = <Task>[];
     final pastTasks = <Task>[];
+    final doneTasks = <Task>[];
 
     for (var task in tasks) {
       final startDateString = task.startDate;
@@ -79,7 +95,9 @@ class _HomePageState extends State<HomePage> {
         final taskStartDate = dateFormatter.parse(startDateString);
         final taskDueDate = dateFormatter.parse(dueDateString);
 
-        if ((taskStartDate.isBefore(currentDate) &&
+        if (task.isDone) {
+          doneTasks.add(task);
+        } else if ((taskStartDate.isBefore(currentDate) &&
                 taskDueDate.isAfter(currentDate)) ||
             taskStartDate == currentDate) {
           todayTasks.add(task);
@@ -103,6 +121,7 @@ class _HomePageState extends State<HomePage> {
       'Közelgő': threeDaysLaterTasks,
       'Függő': futureTasks,
       'Lejárt': pastTasks,
+      'Kesz': doneTasks,
     };
   }
 
@@ -131,7 +150,9 @@ class _HomePageState extends State<HomePage> {
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else if (snapshot.data?.isEmpty ?? true) {
-                  return const Center(child: Text('Nincs megjeleníthető esemény.', style: TextStyle(color: AppColors.antiFlashWhite)));
+                  return const Center(
+                      child: Text('Nincs megjeleníthető esemény.',
+                          style: TextStyle(color: AppColors.antiFlashWhite)));
                 } else {
                   return _buildTaskCategories();
                 }
@@ -149,7 +170,15 @@ class _HomePageState extends State<HomePage> {
         IconButton(
           icon: const Icon(Icons.account_circle,
               color: AppColors.antiFlashWhite, size: 60),
-          onPressed: () => Navigator.pushNamed(context, '/profile'),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => ProfilePage(
+                        categorizedTasksAmount: _categorizedTasksAmount,
+                      )),
+            );
+          },
         ),
       ],
       backgroundColor: AppColors.coolGrey,
@@ -170,12 +199,14 @@ class _HomePageState extends State<HomePage> {
         padding: EdgeInsets.zero,
         children: [
           _buildDrawerHeader(),
-          _buildDrawerItem('Események', Icons.home_rounded, () => Navigator.pushNamed(context, '/home')),
+          _buildDrawerItem('Események', Icons.home_rounded,
+              () => Navigator.pushNamed(context, '/home')),
           _buildDrawerItem('Új esemény', Icons.task_rounded,
               () => Navigator.pushNamed(context, '/create')),
           _buildDrawerItem('Új kategória', Icons.category_rounded,
               () => Navigator.pop(context)),
-          _buildDrawerItem('Archívum', Icons.archive_rounded, () => Navigator.pushNamed(context, '/archive')),
+          _buildDrawerItem('Archívum', Icons.archive_rounded,
+              () => Navigator.pushNamed(context, '/archive')),
           _buildDrawerItem('Eredménytábla', Icons.leaderboard_rounded, () {}),
           _buildDrawerItem('Kijelentkezés', Icons.logout_rounded, () {
             _authService.signOut();
@@ -217,7 +248,9 @@ class _HomePageState extends State<HomePage> {
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: _categorizedTasks.entries.map((entry) {
+        children: _categorizedTasks.entries
+            .where((entry) => entry.key != 'Kesz')
+            .map((entry) {
           return TaskCategorySection(title: entry.key, tasks: entry.value);
         }).toList(),
       ),
@@ -297,12 +330,14 @@ class _TaskCategorySectionState extends State<TaskCategorySection> {
                   title: Text(task.title,
                       style: const TextStyle(color: AppColors.antiFlashWhite)),
                   trailing: IconButton(
-                    icon: const Icon(Icons.read_more_rounded, color: AppColors.antiFlashWhite, size: 40),
+                    icon: const Icon(Icons.read_more_rounded,
+                        color: AppColors.antiFlashWhite, size: 40),
                     onPressed: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => TaskDetailsPage(task: task, title: widget.title)),
+                            builder: (context) => TaskDetailsPage(
+                                task: task, title: widget.title)),
                       );
                     },
                   ),
