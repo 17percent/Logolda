@@ -86,10 +86,12 @@ class _AddTaskPageState extends State<AddTaskPage> {
           await FirebaseFirestore.instance.collection('Difficulties').get();
       setState(() {
         _difficulties = snapshot.docs
-            .map((doc) => {'name': doc['name'] as String, 'value': doc['value'] as int})
+            .map((doc) =>
+                {'name': doc['name'] as String, 'value': doc['value'] as int})
             .toList();
         _difficulties.sort((a, b) => a['value'].compareTo(b['value']));
-        _difficulties = _difficulties.map((item) => item['name'] as String).toList();
+        _difficulties =
+            _difficulties.map((item) => item['name'] as String).toList();
         _isLoadingDifficulties = false; // Update loading state
       });
     } catch (e) {
@@ -115,7 +117,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
       _showSnackBar('Minden mező kitöltése kötelező!');
       return;
     }
-    
+
     if (_startDate!.isAfter(_dueDate!)) {
       _showSnackBar("Az esemény nem kezdőthet később a határidőnél!");
       return;
@@ -163,9 +165,6 @@ class _AddTaskPageState extends State<AddTaskPage> {
     return Scaffold(
       backgroundColor: AppColors.spaceCadet,
       appBar: AppBar(
-        title: const Text('Új Esemény',
-            style: TextStyle(color: AppColors.antiFlashWhite, fontSize: 28)),
-        centerTitle: true,
         backgroundColor: AppColors.coolGrey,
         toolbarHeight: 80,
         leading: IconButton(
@@ -175,80 +174,98 @@ class _AddTaskPageState extends State<AddTaskPage> {
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(32.0),
+        padding: const EdgeInsets.fromLTRB(32, 16, 32, 16),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildLabel('Cím'),
-            _buildTextField(_titleController, 'Esemény címe'),
-            const SizedBox(height: 16),
-            _buildLabel('Leírás'),
-            _buildTextField(_descriptionController, 'Esemény leírása',
-                maxLines: 5),
-            const SizedBox(height: 16),
-            _buildLabel('Helyszín'),
-            _buildTextField(_locationController, 'Esemény helyszíne'),
-            const SizedBox(height: 16),
-            _buildLabel('Kezdő időpont'),
-            _buildDateTimePicker(
-              context,
-              _startDate,
-              _startTime,
-              (date) => setState(() => _startDate = date),
-              (time) => setState(() => _startTime = time),
+            Container(
+              alignment: Alignment.center,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Icon(Icons.add_task_rounded,
+                      size: 100,
+                      color: AppColors.antiFlashWhite.withOpacity(0.2)),
+                  const Text('Új esemény',
+                      style: TextStyle(
+                          fontSize: 28, color: AppColors.antiFlashWhite)),
+                ],
+              ),
             ),
-            const SizedBox(height: 16),
-            _buildLabel('Záró időpont'),
-            _buildDateTimePicker(
-              context,
-              _dueDate,
-              _dueTime,
-              (date) => setState(() => _dueDate = date),
-              (time) => setState(() => _dueTime = time),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Column(
-                  children: [
-                    _buildLabel("Kategória"),
-                    _buildDropDownForCategories(),
-                  ],
+                _buildLabel('Cím'),
+                _buildTextField(_titleController, 'Esemény címe'),
+                const SizedBox(height: 16),
+                _buildLabel('Leírás'),
+                _buildTextField(_descriptionController, 'Esemény leírása',
+                    maxLines: 5),
+                const SizedBox(height: 16),
+                _buildLabel('Helyszín'),
+                _buildTextField(_locationController, 'Esemény helyszíne'),
+                const SizedBox(height: 16),
+                _buildLabel('Kezdő időpont'),
+                _buildDateTimePicker(
+                  context,
+                  _startDate,
+                  _startTime,
+                  (date) => setState(() => _startDate = date),
+                  (time) => setState(() => _startTime = time),
                 ),
-                Column(
-                  children: [
-                    _buildLabel("Nehézség"),
-                    _buildDropDownForDifficulties(),
-                  ],
+                const SizedBox(height: 16),
+                _buildLabel('Záró időpont'),
+                _buildDateTimePicker(
+                  context,
+                  _dueDate,
+                  _dueTime,
+                  (date) => setState(() => _dueDate = date),
+                  (time) => setState(() => _dueTime = time),
                 ),
-              ],
-            ),
-            const SizedBox(height: 30),
-            Center(
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(18),
-                  boxShadow: [
-                    BoxShadow(
-                      blurRadius: 10,
-                      color: Colors.black.withOpacity(0.8),
-                      offset: const Offset(0, 5),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      children: [
+                        _buildLabel("Kategória"),
+                        _buildDropDownForCategories(),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        _buildLabel("Nehézség"),
+                        _buildDropDownForDifficulties(),
+                      ],
                     ),
                   ],
                 ),
-                child: ElevatedButton(
-                  onPressed: _addTaskToFirestore,
-                  style: ElevatedButton.styleFrom(
-                      fixedSize: const Size(90, 80),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(18)),
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      backgroundColor: AppColors.springBud),
-                  child: const Icon(Icons.save_rounded,
-                      color: AppColors.spaceCadet, size: 50),
+                const SizedBox(height: 30),
+                Center(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(18),
+                      boxShadow: [
+                        BoxShadow(
+                          blurRadius: 10,
+                          color: Colors.black.withOpacity(0.8),
+                          offset: const Offset(0, 5),
+                        ),
+                      ],
+                    ),
+                    child: ElevatedButton(
+                      onPressed: _addTaskToFirestore,
+                      style: ElevatedButton.styleFrom(
+                          fixedSize: const Size(90, 80),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(18)),
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          backgroundColor: AppColors.springBud),
+                      child: const Icon(Icons.save_rounded,
+                          color: AppColors.spaceCadet, size: 50),
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
           ],
         ),
@@ -343,7 +360,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
                   underline: const SizedBox(),
                   icon: const Icon(Icons.keyboard_arrow_down_rounded,
                       color: AppColors.coolGrey),
-                      iconSize: 50,
+                  iconSize: 50,
                   style: const TextStyle(
                       color: Colors.black,
                       fontSize: 16,
@@ -398,7 +415,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
                   underline: const SizedBox(),
                   icon: const Icon(Icons.keyboard_arrow_down_rounded,
                       color: AppColors.coolGrey),
-                      iconSize: 50,
+                  iconSize: 50,
                   style: const TextStyle(
                       color: Colors.black,
                       fontSize: 16,

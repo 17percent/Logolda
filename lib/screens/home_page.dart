@@ -204,7 +204,7 @@ class _HomePageState extends State<HomePage> {
           _buildDrawerItem('Új esemény', Icons.task_rounded,
               () => Navigator.pushNamed(context, '/create')),
           _buildDrawerItem('Új kategória', Icons.category_rounded,
-              () => Navigator.pop(context)),
+              () => Navigator.pushNamed(context, '/category')),
           _buildDrawerItem('Archívum', Icons.archive_rounded,
               () => Navigator.pushNamed(context, '/archive')),
           _buildDrawerItem('Eredménytábla', Icons.leaderboard_rounded, () {}),
@@ -359,16 +359,23 @@ class LocalDateDisplay extends StatelessWidget {
     // Get the current date and format it
     final String currentDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
 
-    return Padding(
-      padding: const EdgeInsets.all(32.0),
-      child: Center(
-        child: Text(
-          currentDate,
-          style: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: AppColors.antiFlashWhite),
-        ),
+    return Container(
+      alignment: Alignment.center,
+      padding: const EdgeInsets.all(16.0),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Icon(Icons.calendar_today_rounded,
+                      size: 100,
+                      color: AppColors.antiFlashWhite.withOpacity(0.2)),
+          Text(
+            currentDate,
+            style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: AppColors.antiFlashWhite),
+          ),
+        ],
       ),
     );
   }

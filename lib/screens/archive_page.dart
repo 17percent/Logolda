@@ -60,11 +60,20 @@ class _ArchivePageState extends State<ArchivePage> {
           children: [
             // Page title
             Container(
+              alignment: Alignment.center,
+              padding: const EdgeInsets.all(16),
+              child: Stack(
                 alignment: Alignment.center,
-                padding: const EdgeInsets.all(32),
-                child: const Text('Archívum',
-                    style: TextStyle(
-                        fontSize: 28, color: AppColors.antiFlashWhite))),
+                children: [
+                  Icon(Icons.archive_rounded,
+                      size: 100,
+                      color: AppColors.antiFlashWhite.withOpacity(0.2)),
+                  const Text('Archívum',
+                      style: TextStyle(
+                          fontSize: 28, color: AppColors.antiFlashWhite)),
+                ],
+              ),
+            ),
             FutureBuilder<List<Task>>(
               future: _userTasks,
               builder: (context, snapshot) {
@@ -238,7 +247,10 @@ Container customContainerForArchivedTasks(Task task, BuildContext context) {
           Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => TaskDetailsPage(task: task, title: "Kész",)),
+                builder: (context) => TaskDetailsPage(
+                      task: task,
+                      title: "Kész",
+                    )),
           );
         },
       ),

@@ -3,7 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:logolda/screens/create_page.dart';
 import 'package:logolda/screens/home_page.dart';
 import 'package:logolda/screens/login_page.dart';
-import 'package:logolda/screens/profile_page.dart';
+import 'package:logolda/screens/category_page.dart';
 import 'package:logolda/screens/register_page.dart';
 import 'package:logolda/screens/archive_page.dart';
 
@@ -31,6 +31,7 @@ class MyApp extends StatelessWidget {
         '/signup': (context) => const SignupPage(),
         '/create': (context) => const AddTaskPage(),
         '/archive': (context) => const ArchivePage(),
+        '/category': (context) => const CategoryPage(),
       },
     );
   }
