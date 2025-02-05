@@ -6,6 +6,7 @@ import 'package:logolda/screens/login_page.dart';
 import 'package:logolda/screens/category_page.dart';
 import 'package:logolda/screens/register_page.dart';
 import 'package:logolda/screens/archive_page.dart';
+import 'package:logolda/screens/standings_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,6 +33,7 @@ class MyApp extends StatelessWidget {
         '/create': (context) => const AddTaskPage(),
         '/archive': (context) => const ArchivePage(),
         '/category': (context) => const CategoryPage(),
+        '/standings': (context) => const StandingsPage(),
       },
     );
   }

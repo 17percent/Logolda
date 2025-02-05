@@ -14,21 +14,49 @@ class _CategoryPageState extends State<CategoryPage> {
   final TextEditingController _categoryController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  User? user;
+
+  List<String> _categories = [];
+
+  @override
+  void initState() {
+    super.initState();
+    user = _auth.currentUser;
+    _fetchCategories();
+  }
+
+  Future<void> _fetchCategories() async {
+    if (user != null) {
+      QuerySnapshot snapshot = await _firestore
+          .collection('Categories')
+          .where('userId', isEqualTo: user!.uid)
+          .get();
+
+      setState(() {
+        _categories =
+            snapshot.docs.map((doc) => doc['name'] as String).toList();
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('User not logged in')),
+      );
+    }
+  }
 
   void _saveCategory() async {
     String categoryName = _categoryController.text.trim();
     if (categoryName.isNotEmpty) {
-      User? user = _auth.currentUser;
       if (user != null) {
-        await _firestore.collection('categories').add({
+        await _firestore.collection('Categories').add({
           'name': categoryName,
-          'userId': user.uid,
+          'userId': user!.uid,
           'createdAt': Timestamp.now(),
         });
         _categoryController.clear();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Category saved successfully')),
         );
+        _fetchCategories(); // Update the state and rebuild the widget
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('User not logged in')),
@@ -39,6 +67,119 @@ class _CategoryPageState extends State<CategoryPage> {
         const SnackBar(content: Text('Category name cannot be empty')),
       );
     }
+  }
+
+  void _deleteCategory(String categoryName) async {
+    if (user != null) {
+      QuerySnapshot snapshot = await _firestore
+          .collection('Categories')
+          .where('name', isEqualTo: categoryName)
+          .where('userId', isEqualTo: user!.uid)
+          .get();
+
+      for (QueryDocumentSnapshot doc in snapshot.docs) {
+        await _firestore.collection('Categories').doc(doc.id).delete();
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Category deleted successfully')),
+      );
+      _fetchCategories(); // Update the state and rebuild the widget
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('User not logged in')),
+      );
+    }
+  }
+
+  Widget _buildCategoryList(List<String> categories) {
+    if (categories.isEmpty) {
+      return const Column(
+        children: [
+          Text(
+            'Nincs megjeleníthető adat!',
+            style: TextStyle(color: AppColors.antiFlashWhite, fontSize: 18),
+          ),
+          // Add tutorial here
+        ],
+      );
+    }
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 10),
+      // padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: Column(
+        children: categories.map((category) {
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            margin: const EdgeInsets.symmetric(vertical: 12),
+            decoration: customBoxDeoration(AppColors.coolGrey),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  category,
+                  style: const TextStyle(
+                      color: AppColors.antiFlashWhite, fontSize: 18),
+                ),
+                IconButton(
+                    icon: const Icon(Icons.delete_forever_rounded,
+                        color: AppColors.antiFlashWhite, size: 40),
+                    onPressed: () async {
+                      bool? confirmDelete = await showDialog<bool>(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text('Törlés megerősítése',
+                                style: TextStyle(
+                                    fontSize: 20, fontWeight: FontWeight.bold)),
+                            content:
+                                const Text('Biztosan törlöd ezt a kategóriát?'),
+                            actions: <Widget>[
+                              TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop(false);
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.coolGrey,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: const Text('Mégse',
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            color: AppColors.antiFlashWhite)),
+                                  )),
+                              TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop(true);
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.coolGrey,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: const Text('Törlés',
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            color: AppColors.antiFlashWhite)),
+                                  )),
+                            ],
+                          );
+                        },
+                      );
+
+                      if (confirmDelete == true) {
+                        _deleteCategory(category);
+                      }
+                    }),
+              ],
+            ),
+          );
+        }).toList(),
+      ),
+    );
   }
 
   @override
@@ -72,6 +213,9 @@ class _CategoryPageState extends State<CategoryPage> {
                 ],
               ),
             ),
+            const SizedBox(height: 20),
+            _buildCategoryList(_categories),
+            const SizedBox(height: 20),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -154,4 +298,20 @@ class _CategoryPageState extends State<CategoryPage> {
       ),
     );
   }
+}
+
+BoxDecoration customBoxDeoration(Color color) {
+  return BoxDecoration(
+    borderRadius: BorderRadius.circular(8),
+    color: color,
+    boxShadow: [
+      BoxShadow(
+        blurRadius: 10,
+        blurStyle: BlurStyle.normal,
+        color: Colors.black.withOpacity(0.5),
+        offset: const Offset(0, 5),
+        spreadRadius: 0,
+      )
+    ],
+  );
 }

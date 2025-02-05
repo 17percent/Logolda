@@ -124,10 +124,11 @@ class _ArchivePageState extends State<ArchivePage> {
           _buildDrawerItem('Új esemény', Icons.task_rounded,
               () => Navigator.pushNamed(context, '/create')),
           _buildDrawerItem('Új kategória', Icons.category_rounded,
-              () => Navigator.pop(context)),
+              () => Navigator.pushNamed(context, '/category')),
           _buildDrawerItem('Archívum', Icons.archive_rounded,
               () => Navigator.pushNamed(context, '/archive')),
-          _buildDrawerItem('Eredménytábla', Icons.leaderboard_rounded, () {}),
+          _buildDrawerItem('Eredménytábla', Icons.leaderboard_rounded,
+              () => Navigator.pushNamed(context, '/standings')),
           _buildDrawerItem('Kijelentkezés', Icons.logout_rounded, () {
             _authService.signOut();
             Navigator.pushReplacementNamed(context, '/');
