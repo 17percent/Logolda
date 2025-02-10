@@ -301,17 +301,14 @@ class _SignupPageState extends State<SignupPage> {
               child: ElevatedButton(
                 onPressed: _register,
                 style: ElevatedButton.styleFrom(
-                  fixedSize: const Size(250, 60),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(18)),
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   backgroundColor: AppColors.coolGrey,
                 ),
-                child: const Text(
-                  "Regisztrálok",
-                  style:
-                      TextStyle(fontSize: 20, color: AppColors.antiFlashWhite),
-                ),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: const Icon(Icons.check_rounded, size: 50, color: AppColors.antiFlashWhite)),
               ),
             ),
           ],

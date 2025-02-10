@@ -112,7 +112,7 @@ class _CategoryPageState extends State<CategoryPage> {
           return Container(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             margin: const EdgeInsets.symmetric(vertical: 12),
-            decoration: customBoxDeoration(AppColors.coolGrey),
+            decoration: customBoxDeoration(AppColors.coolGrey, 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -140,31 +140,27 @@ class _CategoryPageState extends State<CategoryPage> {
                                     Navigator.of(context).pop(false);
                                   },
                                   child: Container(
-                                    padding: const EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.coolGrey,
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: const Text('Mégse',
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            color: AppColors.antiFlashWhite)),
-                                  )),
+                              padding: const EdgeInsets.all(10),
+                              decoration:
+                                  customBoxDeoration(AppColors.coolGrey, 10),
+                              child: const Icon(
+                                  Icons.arrow_circle_left_outlined,
+                                  color: AppColors.antiFlashWhite,
+                                  size: 40),
+                            )),
                               TextButton(
                                   onPressed: () {
                                     Navigator.of(context).pop(true);
                                   },
                                   child: Container(
-                                    padding: const EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.coolGrey,
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: const Text('Törlés',
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            color: AppColors.antiFlashWhite)),
-                                  )),
+                              padding: const EdgeInsets.all(10),
+                              decoration:
+                                  customBoxDeoration(AppColors.pantoneRed, 10),
+                              child: const Icon(
+                                  Icons.delete_forever_rounded,
+                                  color: AppColors.antiFlashWhite,
+                                  size: 40),
+                            )),
                             ],
                           );
                         },
@@ -300,9 +296,9 @@ class _CategoryPageState extends State<CategoryPage> {
   }
 }
 
-BoxDecoration customBoxDeoration(Color color) {
+BoxDecoration customBoxDeoration(Color color, double radius) {
   return BoxDecoration(
-    borderRadius: BorderRadius.circular(8),
+    borderRadius: BorderRadius.circular(radius),
     color: color,
     boxShadow: [
       BoxShadow(

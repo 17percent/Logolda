@@ -194,15 +194,13 @@ class _LoginPageState extends State<LoginPage> {
             child: ElevatedButton(
               onPressed: _login,
               style: ElevatedButton.styleFrom(
-                  fixedSize: const Size(250, 60),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(18)),
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   backgroundColor: AppColors.coolGrey),
-              child: const Text(
-                "Bejelentkezés",
-                style: TextStyle(fontSize: 20, color: AppColors.antiFlashWhite),
-              ),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: const Icon(Icons.login_rounded, size: 50, color: AppColors.antiFlashWhite)),
             ),
           ),
         ],

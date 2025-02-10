@@ -85,7 +85,8 @@ class _ModifyPageState extends State<ModifyPage> {
           'difficulty': _selectedDifficulty,
         });
         if (mounted) {
-          Navigator.pushNamedAndRemoveUntil(context, '/home', (Route<dynamic> route) => false);
+          Navigator.pushNamedAndRemoveUntil(
+              context, '/home', (Route<dynamic> route) => false);
         }
       } catch (e) {
         _showSnackBar('Error saving task: $e');
@@ -164,22 +165,11 @@ class _ModifyPageState extends State<ModifyPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 10),
         _isLoadingCategories
             ? const CircularProgressIndicator(color: AppColors.springBud)
             : Container(
                 padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(18),
-                  color: AppColors.antiFlashWhite,
-                  boxShadow: [
-                    BoxShadow(
-                      blurRadius: 10,
-                      color: Colors.black.withOpacity(0.8),
-                      offset: const Offset(0, 5),
-                    ),
-                  ],
-                ),
+                decoration: customBoxDeoration(AppColors.antiFlashWhite, 18),
                 child: DropdownButton<String>(
                   value: _selectedCategory,
                   hint: const Icon(
@@ -219,22 +209,11 @@ class _ModifyPageState extends State<ModifyPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 10),
         _isLoadingDifficulties
             ? const CircularProgressIndicator(color: AppColors.springBud)
             : Container(
                 padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(18),
-                  color: AppColors.antiFlashWhite,
-                  boxShadow: [
-                    BoxShadow(
-                      blurRadius: 10,
-                      color: Colors.black.withOpacity(0.8),
-                      offset: const Offset(0, 5),
-                    ),
-                  ],
-                ),
+                decoration: customBoxDeoration(AppColors.antiFlashWhite, 18),
                 child: DropdownButton<String>(
                   value: _selectedDifficulty,
                   hint: const Icon(
@@ -242,7 +221,7 @@ class _ModifyPageState extends State<ModifyPage> {
                     color: AppColors.coolGrey,
                     size: 50,
                   ),
-                    items: _difficultiesAndScores.keys
+                  items: _difficultiesAndScores.keys
                       .map<DropdownMenuItem<String>>((dynamic diff) {
                     return DropdownMenuItem<String>(
                       value: diff,
@@ -280,49 +259,27 @@ class _ModifyPageState extends State<ModifyPage> {
     return Row(
       children: [
         Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(18),
-            boxShadow: [
-              BoxShadow(
-                blurRadius: 10,
-                blurStyle: BlurStyle.normal,
-                color: Colors.black.withOpacity(0.8),
-                offset: const Offset(0, 5),
-                spreadRadius: 0,
-              ),
-            ],
-          ),
+          decoration: customBoxDeoration(AppColors.antiFlashWhite, 18),
           child: ElevatedButton(
             onPressed: () => _pickDate(context, date, onDatePicked),
-            style: _buttonStyle(),
+            style: _buttonStyle(AppColors.antiFlashWhite),
             child: const Icon(Icons.calendar_month_rounded,
                 color: AppColors.coolGrey, size: 50),
           ),
         ),
         const SizedBox(width: 20),
         Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(18),
-            boxShadow: [
-              BoxShadow(
-                blurRadius: 10,
-                blurStyle: BlurStyle.normal,
-                color: Colors.black.withOpacity(0.8),
-                offset: const Offset(0, 5),
-                spreadRadius: 0,
-              ),
-            ],
-          ),
+          decoration: customBoxDeoration(AppColors.antiFlashWhite, 18),
           child: ElevatedButton(
             onPressed: () => _pickTime(context, time, onTimePicked),
-            style: _buttonStyle(),
+            style: _buttonStyle(AppColors.antiFlashWhite),
             child: const Icon(Icons.schedule_rounded,
                 color: AppColors.coolGrey, size: 50),
           ),
         ),
         const SizedBox(width: 20),
         Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             _buildDateTimeText(date?.toIso8601String().substring(0, 10)),
             _buildDateTimeText(time),
@@ -348,7 +305,7 @@ class _ModifyPageState extends State<ModifyPage> {
     );
   }
 
-  ButtonStyle _buttonStyle() {
+  ButtonStyle _buttonStyle(Color color) {
     return ElevatedButton.styleFrom(
       elevation: 10,
       shadowColor: Colors.black.withOpacity(0.8),
@@ -356,7 +313,7 @@ class _ModifyPageState extends State<ModifyPage> {
         borderRadius: BorderRadius.circular(18),
       ),
       padding: const EdgeInsets.all(16),
-      backgroundColor: AppColors.antiFlashWhite,
+      backgroundColor: color,
     );
   }
 
@@ -368,7 +325,7 @@ class _ModifyPageState extends State<ModifyPage> {
         BoxShadow(
           blurRadius: 10,
           blurStyle: BlurStyle.normal,
-          color: Colors.black.withOpacity(0.5),
+          color: Colors.black.withOpacity(0.8),
           offset: const Offset(0, 5),
           spreadRadius: 0,
         )
@@ -389,9 +346,6 @@ class _ModifyPageState extends State<ModifyPage> {
     return Scaffold(
       backgroundColor: AppColors.spaceCadet,
       appBar: AppBar(
-        title: const Text('Módosítás',
-            style: TextStyle(color: AppColors.antiFlashWhite, fontSize: 28)),
-        centerTitle: true,
         backgroundColor: AppColors.coolGrey,
         toolbarHeight: 80,
         leading: IconButton(
@@ -401,73 +355,89 @@ class _ModifyPageState extends State<ModifyPage> {
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(32.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildLabel('Cím'),
-              _buildTextField(_titleController, 'Esemény címe'),
-              const SizedBox(height: 16),
-              _buildLabel('Leírás'),
-              _buildTextField(_descriptionController, 'Esemény leírása',
-                  maxLines: 5),
-              const SizedBox(height: 16),
-              _buildLabel('Helyszín'),
-              _buildTextField(_locationController, 'Esemény helyszíne'),
-              const SizedBox(height: 16),
-              _buildLabel('Kezdő időpont'),
-              _buildDateTimePicker(
-                context,
-                _startDate,
-                _startTime,
-                (date) => setState(() => _startDate = date),
-                (time) => setState(() => _startTime = time),
-              ),
-              const SizedBox(height: 16),
-              _buildLabel('Záró időpont'),
-              _buildDateTimePicker(
-                context,
-                _dueDate,
-                _dueTime,
-                (date) => setState(() => _dueDate = date),
-                (time) => setState(() => _dueTime = time),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        padding: const EdgeInsets.fromLTRB(32, 16, 32, 16),
+        child: Column(
+          children: [
+            Container(
+              alignment: Alignment.center,
+              child: Stack(
+                alignment: Alignment.center,
                 children: [
+                  Icon(Icons.edit_rounded,
+                      size: 100,
+                      color: AppColors.antiFlashWhite.withOpacity(0.2)),
+                  const Text('Módosítás',
+                      style: TextStyle(
+                          fontSize: 28, color: AppColors.antiFlashWhite)),
+                ],
+              ),
+            ),
+            Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildLabel('Cím'),
+                  _buildTextField(_titleController, 'Esemény címe'),
+                  const SizedBox(height: 16),
+                  _buildLabel('Leírás'),
+                  _buildTextField(_descriptionController, 'Esemény leírása',
+                      maxLines: 5),
+                  const SizedBox(height: 16),
+                  _buildLabel('Helyszín'),
+                  _buildTextField(_locationController, 'Esemény helyszíne'),
+                  const SizedBox(height: 16),
+                  _buildLabel('Kezdő időpont'),
+                  _buildDateTimePicker(
+                    context,
+                    _startDate,
+                    _startTime,
+                    (date) => setState(() => _startDate = date),
+                    (time) => setState(() => _startTime = time),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildLabel('Záró időpont'),
+                  _buildDateTimePicker(
+                    context,
+                    _dueDate,
+                    _dueTime,
+                    (date) => setState(() => _dueDate = date),
+                    (time) => setState(() => _dueTime = time),
+                  ),
+                  const SizedBox(height: 16),
                   Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildLabel("Kategória"),
                       _buildDropDownForCategories(),
                     ],
                   ),
                   Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildLabel("Nehézség"),
                       _buildDropDownForDifficulties(),
                     ],
                   ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              Center(
-                child: Container(
-                  decoration: customBoxDeoration(AppColors.springBud, 18),
-                  child: IconButton(
-                    icon: const Icon(Icons.save_rounded,
-                        size: 50, color: AppColors.spaceCadet),
-                    onPressed: _saveTask,
-                    style: ElevatedButton.styleFrom(
-                      fixedSize: const Size(90, 80),
+                  const SizedBox(height: 30),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 32),
+                    child: Center(
+                      child: Container(
+                        decoration: customBoxDeoration(AppColors.springBud, 18),
+                        child: ElevatedButton(
+                          onPressed: _saveTask,
+                          style: _buttonStyle(AppColors.springBud),
+                          child: const Icon(Icons.save_rounded,
+                              size: 50, color: AppColors.spaceCadet),
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -485,16 +455,7 @@ class _ModifyPageState extends State<ModifyPage> {
   Widget _buildTextField(TextEditingController controller, String hint,
       {int maxLines = 1}) {
     return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            blurRadius: 10,
-            color: Colors.black.withOpacity(0.8),
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
+      decoration: customBoxDeoration(AppColors.antiFlashWhite, 18),
       child: TextField(
         controller: controller,
         maxLines: maxLines,

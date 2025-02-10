@@ -238,9 +238,10 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildDrawerItem(String title, IconData icon, VoidCallback onTap) {
     return ListTile(
-      leading: Icon(icon, color: AppColors.spaceCadet),
+      contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
+      leading: Icon(icon, color: AppColors.spaceCadet, size: 30),
       title: Text(title,
-          style: const TextStyle(color: AppColors.spaceCadet, fontSize: 16)),
+          style: const TextStyle(color: AppColors.spaceCadet, fontSize: 18)),
       onTap: onTap,
     );
   }

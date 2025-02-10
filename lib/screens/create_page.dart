@@ -222,46 +222,32 @@ class _AddTaskPageState extends State<AddTaskPage> {
                   (time) => setState(() => _dueTime = time),
                 ),
                 const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Column(
-                      children: [
-                        _buildLabel("Kategória"),
-                        _buildDropDownForCategories(),
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        _buildLabel("Nehézség"),
-                        _buildDropDownForDifficulties(),
-                      ],
-                    ),
+                    _buildLabel("Kategória"),
+                    _buildDropDownForCategories(),
+                  ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildLabel("Nehézség"),
+                    _buildDropDownForDifficulties(),
                   ],
                 ),
                 const SizedBox(height: 30),
-                Center(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(18),
-                      boxShadow: [
-                        BoxShadow(
-                          blurRadius: 10,
-                          color: Colors.black.withOpacity(0.8),
-                          offset: const Offset(0, 5),
-                        ),
-                      ],
-                    ),
-                    child: ElevatedButton(
-                      onPressed: _addTaskToFirestore,
-                      style: ElevatedButton.styleFrom(
-                          fixedSize: const Size(90, 80),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(18)),
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          backgroundColor: AppColors.springBud),
-                      child: const Icon(Icons.save_rounded,
-                          color: AppColors.spaceCadet, size: 50),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 32),
+                  child: Center(
+                    child: Container(
+                      decoration: customBoxDeoration(AppColors.springBud, 18),
+                      child: ElevatedButton(
+                        onPressed: _addTaskToFirestore,
+                        style: _buttonStyle(AppColors.springBud),
+                        child: const Icon(Icons.save_rounded,
+                            color: AppColors.spaceCadet, size: 50),
+                      ),
                     ),
                   ),
                 ),
@@ -285,16 +271,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
   Widget _buildTextField(TextEditingController controller, String hint,
       {int maxLines = 1}) {
     return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            blurRadius: 10,
-            color: Colors.black.withOpacity(0.8),
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
+      decoration: customBoxDeoration(AppColors.antiFlashWhite, 18),
       child: TextField(
         controller: controller,
         maxLines: maxLines,
@@ -321,22 +298,11 @@ class _AddTaskPageState extends State<AddTaskPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 10),
         _isLoadingCategories
             ? const CircularProgressIndicator(color: AppColors.springBud)
             : Container(
                 padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(18),
-                  color: AppColors.antiFlashWhite,
-                  boxShadow: [
-                    BoxShadow(
-                      blurRadius: 10,
-                      color: Colors.black.withOpacity(0.8),
-                      offset: const Offset(0, 5),
-                    ),
-                  ],
-                ),
+                decoration: customBoxDeoration(AppColors.antiFlashWhite, 18),
                 child: DropdownButton<String>(
                   value: _selectedCategory,
                   hint: const Icon(
@@ -376,22 +342,11 @@ class _AddTaskPageState extends State<AddTaskPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 10),
         _isLoadingDifficulties
             ? const CircularProgressIndicator(color: AppColors.springBud)
             : Container(
                 padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(18),
-                  color: AppColors.antiFlashWhite,
-                  boxShadow: [
-                    BoxShadow(
-                      blurRadius: 10,
-                      color: Colors.black.withOpacity(0.8),
-                      offset: const Offset(0, 5),
-                    ),
-                  ],
-                ),
+                decoration: customBoxDeoration(AppColors.antiFlashWhite, 18),
                 child: DropdownButton<String>(
                   value: _selectedDifficulty,
                   hint: const Icon(
@@ -437,49 +392,27 @@ class _AddTaskPageState extends State<AddTaskPage> {
     return Row(
       children: [
         Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(18),
-            boxShadow: [
-              BoxShadow(
-                blurRadius: 10,
-                blurStyle: BlurStyle.normal,
-                color: Colors.black.withOpacity(0.8),
-                offset: const Offset(0, 5),
-                spreadRadius: 0,
-              ),
-            ],
-          ),
+          decoration: customBoxDeoration(AppColors.antiFlashWhite, 18),
           child: ElevatedButton(
             onPressed: () => _pickDate(context, date, onDatePicked),
-            style: _buttonStyle(),
+            style: _buttonStyle(AppColors.antiFlashWhite),
             child: const Icon(Icons.calendar_month_rounded,
                 color: AppColors.coolGrey, size: 50),
           ),
         ),
         const SizedBox(width: 20),
         Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(18),
-            boxShadow: [
-              BoxShadow(
-                blurRadius: 10,
-                blurStyle: BlurStyle.normal,
-                color: Colors.black.withOpacity(0.8),
-                offset: const Offset(0, 5),
-                spreadRadius: 0,
-              ),
-            ],
-          ),
+          decoration: customBoxDeoration(AppColors.antiFlashWhite, 18),
           child: ElevatedButton(
             onPressed: () => _pickTime(context, time, onTimePicked),
-            style: _buttonStyle(),
+            style: _buttonStyle(AppColors.antiFlashWhite),
             child: const Icon(Icons.schedule_rounded,
                 color: AppColors.coolGrey, size: 50),
           ),
         ),
         const SizedBox(width: 20),
         Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             _buildDateTimeText(date?.toIso8601String().substring(0, 10)),
             _buildDateTimeText(time),
@@ -505,7 +438,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
     );
   }
 
-  ButtonStyle _buttonStyle() {
+  ButtonStyle _buttonStyle(Color color) {
     return ElevatedButton.styleFrom(
       elevation: 10,
       shadowColor: Colors.black.withOpacity(0.8),
@@ -513,7 +446,23 @@ class _AddTaskPageState extends State<AddTaskPage> {
         borderRadius: BorderRadius.circular(18),
       ),
       padding: const EdgeInsets.all(16),
-      backgroundColor: AppColors.antiFlashWhite,
+      backgroundColor: color,
     );
   }
+}
+
+BoxDecoration customBoxDeoration(Color color, double radius) {
+  return BoxDecoration(
+    borderRadius: BorderRadius.circular(radius),
+    color: color,
+    boxShadow: [
+      BoxShadow(
+        blurRadius: 10,
+        blurStyle: BlurStyle.normal,
+        color: Colors.black.withOpacity(0.8),
+        offset: const Offset(0, 5),
+        spreadRadius: 0,
+      )
+    ],
+  );
 }

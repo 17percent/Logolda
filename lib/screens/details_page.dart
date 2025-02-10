@@ -55,30 +55,25 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                             },
                             child: Container(
                               padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: AppColors.coolGrey,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: const Text('Mégse',
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      color: AppColors.antiFlashWhite)),
+                              decoration:
+                                  customBoxDeoration(AppColors.coolGrey, 10),
+                              child: const Icon(
+                                  Icons.arrow_circle_left_outlined,
+                                  color: AppColors.antiFlashWhite,
+                                  size: 40),
                             )),
                         TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop(true);
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: AppColors.coolGrey,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: const Text('Törlés',
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      color: AppColors.antiFlashWhite)),
-                            )),
+                          onPressed: () {
+                            Navigator.of(context).pop(true);
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration:
+                                customBoxDeoration(AppColors.pantoneRed, 10),
+                            child: const Icon(Icons.delete_forever_rounded,
+                                color: AppColors.antiFlashWhite, size: 40),
+                          ),
+                        ),
                       ],
                     );
                   },
@@ -174,9 +169,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
               await markTaskAsDone(widget.task.id);
               await updateUserScore();
             },
-            style: ElevatedButton.styleFrom(
-              fixedSize: const Size(90, 80),
-            ),
+            style: _buttonStyle(AppColors.springBud),
           ),
         ),
         const SizedBox(width: 10),
@@ -211,9 +204,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
               }
             },
             color: AppColors.antiFlashWhite,
-            style: ElevatedButton.styleFrom(
-              fixedSize: const Size(90, 80),
-            ),
+            style: _buttonStyle(AppColors.coolGrey),
           ),
         ),
       ],
@@ -314,6 +305,18 @@ Container buildTaskDetailsContainer(String taskTitle, String value) {
         ),
       ],
     ),
+  );
+}
+
+ButtonStyle _buttonStyle(Color color) {
+  return ElevatedButton.styleFrom(
+    elevation: 10,
+    shadowColor: Colors.black.withOpacity(0.8),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(18),
+    ),
+    padding: const EdgeInsets.all(16),
+    backgroundColor: color,
   );
 }
 
