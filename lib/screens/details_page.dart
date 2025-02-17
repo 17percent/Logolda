@@ -275,7 +275,7 @@ Container buildTaskDetailsContainer(String taskTitle, String value) {
   return Container(
     margin: const EdgeInsets.all(10),
     padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-    decoration: customBoxDeoration(AppColors.coolGrey, 8),
+    decoration: customBoxDeoration(AppColors.coolGrey, 18),
     child: Row(
       children: [
         Text(taskTitle,
@@ -290,8 +290,8 @@ Container buildTaskDetailsContainer(String taskTitle, String value) {
             decoration: const BoxDecoration(
               color: AppColors.antiFlashWhite,
               borderRadius: BorderRadius.only(
-                topRight: Radius.circular(8),
-                bottomRight: Radius.circular(8),
+                topRight: Radius.circular(18),
+                bottomRight: Radius.circular(18),
               ),
             ),
             alignment: Alignment.centerRight,

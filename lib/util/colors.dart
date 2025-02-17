@@ -10,5 +10,7 @@ class AppColors {
   static const Color goldYellow = Color(0xFFFFD60A);
   static const Color amethystPurple = Color(0xFF9D4EDD);
   static const Color orangePeel = Color(0xFFFF9E00);
+  static const Color silverGrey = Color(0xFFc0c0c0);
+  static const Color bronzeBrown = Color(0xFFCD7F32);
   
 }

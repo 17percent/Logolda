@@ -16,13 +16,33 @@ class _StandingsPageState extends State<StandingsPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   User? user;
 
-  List<User> _users = [];
-  Map<String, int> _standings = {};
+  Map<String, Map<String, dynamic>> _standings = {};
 
   @override
   void initState() {
     super.initState();
     user = _authService.getLoggedInUser();
+    _fetchUsers();
+  }
+  
+  Future _fetchUsers() async {
+    try {
+      QuerySnapshot snapshot = await _firestore.collection('Users').get();
+      setState(() {
+        _standings = {
+          for (var doc in snapshot.docs)
+            doc['uid']: {'username': doc['name'], 'seed': doc['seeds']}
+        };
+      });
+    } catch (e) {
+      print('Error fetching users: $e');
+    }
+  }
+
+  void _sortMappedUsers() {
+    var sortedEntries = _standings.entries.toList()
+      ..sort((a, b) => b.value['seed'].compareTo(a.value['seed']));
+    _standings = Map.fromEntries(sortedEntries);
   }
 
   AppBar _buildAppBar() {
@@ -95,6 +115,69 @@ class _StandingsPageState extends State<StandingsPage> {
     );
   }
 
+  Widget _buildStandings() {
+    if (_standings.isEmpty) {
+      return Container(
+        margin: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+        alignment: Alignment.center,
+        padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
+        decoration: customBoxDeoration(AppColors.antiFlashWhite, 18),
+        child: const Text(
+          'Nincs megjeleníthető adat.',
+          style: TextStyle(color: AppColors.spaceCadet, fontSize: 16),
+        ),
+      );
+    } else {
+      _sortMappedUsers();
+    return Column(
+      children: _standings.entries.map((entry) {
+      int index = _standings.keys.toList().indexOf(entry.key);
+      BoxDecoration decoration;
+      if (index == 0) {
+        decoration = customBoxDeoration(AppColors.goldYellow, 18);
+      } else if (index == 1) {
+        decoration = customBoxDeoration(AppColors.silverGrey, 18);
+      } else if (index == 2) {
+        decoration = customBoxDeoration(AppColors.bronzeBrown, 18);
+      } else {
+        decoration = customBoxDeoration(AppColors.antiFlashWhite, 18);
+      }
+      return Container(
+        margin: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+        padding: const EdgeInsets.fromLTRB(10, 16, 10, 16),
+        decoration: decoration,
+        child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+          child: Text(
+            (index + 1).toString(),
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.spaceCadet, fontSize: 16),
+          ),
+          ),
+          Expanded(
+          child: Text(
+            entry.value['seed'].toString(),
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: AppColors.spaceCadet, fontSize: 16),
+          ),
+          ),
+          Expanded(
+          child: Text(
+            entry.value['username'],
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: AppColors.spaceCadet, fontSize: 16),
+          ),
+          ),
+        ],
+        ),
+      );
+      }).toList(),
+    );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -136,25 +219,25 @@ class _StandingsPageState extends State<StandingsPage> {
                         color: AppColors.antiFlashWhite, fontSize: 16)),
               ],
             ),
-            Container(
-              margin: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-              alignment: Alignment.center,
-              padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
-              decoration: customBoxDeoration(AppColors.antiFlashWhite),
-              child: const Text('Nincs megjeleníthető adat.',
-                  style: TextStyle(color: AppColors.spaceCadet, fontSize: 16),
-              )
-            ),
+            _buildStandings(),
           ],
         ),
       ),
     );
   }
+
+  void _showSnackBar(String message) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+    }
+  }
 }
 
-BoxDecoration customBoxDeoration(Color color) {
+BoxDecoration customBoxDeoration(Color color, double radius) {
   return BoxDecoration(
-    borderRadius: BorderRadius.circular(8),
+    borderRadius: BorderRadius.circular(radius),
     color: color,
     boxShadow: [
       BoxShadow(
@@ -167,3 +250,5 @@ BoxDecoration customBoxDeoration(Color color) {
     ],
   );
 }
+
+

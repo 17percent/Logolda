@@ -149,10 +149,59 @@ class _HomePageState extends State<HomePage> {
                   return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
-                } else if (snapshot.data?.isEmpty ?? true) {
-                  return const Center(
-                      child: Text('Nincs megjeleníthető esemény.',
-                          style: TextStyle(color: AppColors.antiFlashWhite)));
+                } else if (!snapshot.hasData ||
+                    snapshot.data!.isEmpty ||
+                    snapshot.data!.every((task) => task.isDone)) {
+                  return Column(
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.fromLTRB(20, 10, 20, 20),
+                        padding: const EdgeInsets.all(16),
+                        decoration:
+                            customBoxDeoration(AppColors.antiFlashWhite, 18),
+                        child: Text('Hozd létre saját eseményeidet!',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: AppColors.spaceCadet)),
+                      ),
+                      Divider(
+                        color: AppColors.antiFlashWhite,
+                        thickness: 2,
+                        indent: 35,
+                        endIndent: 35,
+                      ),
+                      Container(
+                        margin: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                        padding: const EdgeInsets.all(16),
+                        child: Text(
+                          'Az eseményeket kategóriákba rendezheted! Ne felejtsd el létrehozni a kategóriákat is, ha korábban még nem tetted!',
+                          style: TextStyle(
+                              fontSize: 16, color: AppColors.antiFlashWhite),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          // Create new task button
+                          _buildActionButtons(
+                              const Icon(Icons.add_circle_outline_rounded,
+                                  color: AppColors.antiFlashWhite, size: 50),
+                              'Új esemény', () async{
+                            Navigator.pushNamed(context, '/create');
+                          }),
+                          // Create new category button
+                          _buildActionButtons(
+                              const Icon(Icons.add_circle_outline_rounded,
+                                  color: AppColors.antiFlashWhite, size: 50),
+                              'Új kategória', () async {
+                            Navigator.pushNamed(context, '/category');
+                          }),
+                        ],
+                      ),
+                    ],
+                  );
                 } else {
                   return _buildTaskCategories();
                 }
@@ -260,6 +309,27 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
+Widget _buildActionButtons(Icon icon, String title, Function onPressed) {
+  return Column(
+    children: [
+      Container(
+        margin: const EdgeInsets.symmetric(horizontal: 20),
+        decoration: customBoxDeoration(AppColors.coolGrey, 18),
+        child: IconButton(
+          icon: icon,
+          onPressed: onPressed as void Function()?,
+          style: _buttonStyle(AppColors.coolGrey),
+        ),
+      ),
+      const SizedBox(height: 10),
+      Text(
+        title,
+        style: const TextStyle(fontSize: 16, color: AppColors.antiFlashWhite),
+      ),
+    ],
+  );
+}
+
 Color getColorBasedOnStatus(String status) {
   switch (status) {
     case 'Esedékes':
@@ -302,11 +372,11 @@ class _TaskCategorySectionState extends State<TaskCategorySection> {
       padding: const EdgeInsets.symmetric(horizontal: 24.0),
       child: Container(
         margin: const EdgeInsets.only(bottom: 25),
-        decoration: customBoxDeoration(getColorBasedOnStatus(widget.title)),
+        decoration: customBoxDeoration(getColorBasedOnStatus(widget.title), 18),
         child: Card(
           elevation: 4,
           shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
           child: ExpansionTile(
             title: Text(
               widget.title,
@@ -327,7 +397,7 @@ class _TaskCategorySectionState extends State<TaskCategorySection> {
               return Container(
                 margin: const EdgeInsets.all(12),
                 // padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                decoration: customBoxDeoration(AppColors.coolGrey),
+                decoration: customBoxDeoration(AppColors.coolGrey, 18),
                 child: ListTile(
                   title: Text(task.title,
                       style: const TextStyle(color: AppColors.antiFlashWhite)),
@@ -368,8 +438,7 @@ class LocalDateDisplay extends StatelessWidget {
         alignment: Alignment.center,
         children: [
           Icon(Icons.calendar_today_rounded,
-                      size: 100,
-                      color: AppColors.antiFlashWhite.withOpacity(0.2)),
+              size: 100, color: AppColors.antiFlashWhite.withOpacity(0.2)),
           Text(
             currentDate,
             style: const TextStyle(
@@ -383,9 +452,9 @@ class LocalDateDisplay extends StatelessWidget {
   }
 }
 
-BoxDecoration customBoxDeoration(Color color) {
+BoxDecoration customBoxDeoration(Color color, double radius) {
   return BoxDecoration(
-    borderRadius: BorderRadius.circular(8),
+    borderRadius: BorderRadius.circular(radius),
     color: color,
     boxShadow: [
       BoxShadow(
@@ -396,5 +465,17 @@ BoxDecoration customBoxDeoration(Color color) {
         spreadRadius: 0,
       )
     ],
+  );
+}
+
+ButtonStyle _buttonStyle(Color color) {
+  return ElevatedButton.styleFrom(
+    elevation: 10,
+    shadowColor: Colors.black.withOpacity(0.8),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(18),
+    ),
+    padding: const EdgeInsets.all(16),
+    backgroundColor: color,
   );
 }

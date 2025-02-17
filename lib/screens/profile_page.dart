@@ -101,19 +101,8 @@ class _ProfilePageState extends State<ProfilePage> {
                               alignment: Alignment.center,
                               width: 150,
                               padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                color: AppColors.antiFlashWhite,
-                                boxShadow: [
-                                  BoxShadow(
-                                    blurRadius: 10,
-                                    blurStyle: BlurStyle.normal,
-                                    color: Colors.black.withOpacity(0.8),
-                                    offset: const Offset(0, 5),
-                                    spreadRadius: 0,
-                                  )
-                                ],
-                              ),
+                              decoration: customBoxDeoration(
+                                  AppColors.antiFlashWhite, 18),
                               child: Text(
                                 '${userData['rank']}',
                                 style: const TextStyle(
@@ -132,19 +121,8 @@ class _ProfilePageState extends State<ProfilePage> {
                               width: 150,
                               alignment: Alignment.center,
                               padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                color: AppColors.antiFlashWhite,
-                                boxShadow: [
-                                  BoxShadow(
-                                    blurRadius: 10,
-                                    blurStyle: BlurStyle.normal,
-                                    color: Colors.black.withOpacity(0.8),
-                                    offset: const Offset(0, 5),
-                                    spreadRadius: 0,
-                                  )
-                                ],
-                              ),
+                              decoration: customBoxDeoration(
+                                  AppColors.antiFlashWhite, 18),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -196,19 +174,7 @@ Widget buildTaskRows(Map<String, int> tasks) {
       return Container(
         margin: const EdgeInsets.fromLTRB(12, 10, 12, 10),
         padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: getColorBasedOnStatus(entry.key),
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: [
-            BoxShadow(
-              blurRadius: 10,
-              blurStyle: BlurStyle.normal,
-              color: Colors.black.withOpacity(0.8),
-              offset: const Offset(0, 5),
-              spreadRadius: 0,
-            )
-          ],
-        ),
+        decoration: customBoxDeoration(getColorBasedOnStatus(entry.key), 18),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -248,4 +214,20 @@ Color getColorBasedOnStatus(String status) {
     default:
       return AppColors.antiFlashWhite;
   }
+}
+
+BoxDecoration customBoxDeoration(Color color, double radius) {
+  return BoxDecoration(
+    borderRadius: BorderRadius.circular(radius),
+    color: color,
+    boxShadow: [
+      BoxShadow(
+        blurRadius: 10,
+        blurStyle: BlurStyle.normal,
+        color: Colors.black.withOpacity(0.5),
+        offset: const Offset(0, 5),
+        spreadRadius: 0,
+      )
+    ],
+  );
 }

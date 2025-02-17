@@ -33,35 +33,59 @@ class _SignupPageState extends State<SignupPage> {
               content: Text(
                   "A megadott jelszónak legalább 6 karakter hosszúnak kell lennie!")),
         );
-      }
-      final user =
-          await _authService.registerWithEmailPassword(email, password);
+      } else if (password != passwordAgain) {
+        // Passwords don't match
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("A jelszavak nem egyeznek!")),
+        );
+      } else if (username.isEmpty || email.isEmpty || password.isEmpty) {
+        // Empty fields
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Minden mező kitöltése kötelező!")),
+        );
+      } else if (!email.contains('@') || !email.contains('.')) {
+        // Invalid email
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Érvénytelen e-mail cím!")),
+        );
+      } else if (username.length > 9) {
+        // Username too long
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content:
+                  Text('A felhasználónév maximum 9 karakter hosszú lehet!')),
+        );
+      } else {
+        // Register user
+        final user =
+            await _authService.registerWithEmailPassword(email, password);
 
-      if (user != null) {
-        if (mounted) {
-          // Save user data to Firestore
-          await _firestore.collection('Users').doc(user.uid).set({
-            'uid': user.uid,
-            'name': username,
-            'email': email,
-            'rank': "Logger",
-            'seeds': 0,
-            'createdAt': DateTime.now(),
-          });
+        if (user != null) {
           if (mounted) {
-            // Taking user back to login
-            Navigator.pushNamed(context, '/');
-            // Sending info to screen
+            // Save user data to Firestore
+            await _firestore.collection('Users').doc(user.uid).set({
+              'uid': user.uid,
+              'name': username,
+              'email': email,
+              'rank': "Logger",
+              'seeds': 0,
+              'createdAt': DateTime.now(),
+            });
+            if (mounted) {
+              // Taking user back to login
+              Navigator.pushNamed(context, '/');
+              // Sending info to screen
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Sikeres regisztráció!")),
+              );
+            }
+          }
+        } else {
+          if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Sikeres regisztráció!")),
+              const SnackBar(content: Text("Sikertelen regisztráció!")),
             );
           }
-        }
-      } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Sikertelen regisztráció!")),
-          );
         }
       }
     } catch (e) {
@@ -307,8 +331,9 @@ class _SignupPageState extends State<SignupPage> {
                   backgroundColor: AppColors.coolGrey,
                 ),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: const Icon(Icons.check_rounded, size: 50, color: AppColors.antiFlashWhite)),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: const Icon(Icons.check_rounded,
+                        size: 50, color: AppColors.antiFlashWhite)),
               ),
             ),
           ],

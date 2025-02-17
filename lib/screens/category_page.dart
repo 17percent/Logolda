@@ -54,7 +54,7 @@ class _CategoryPageState extends State<CategoryPage> {
         });
         _categoryController.clear();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Category saved successfully')),
+          const SnackBar(content: Text('Sikeres mentés!')),
         );
         _fetchCategories(); // Update the state and rebuild the widget
       } else {
@@ -64,7 +64,7 @@ class _CategoryPageState extends State<CategoryPage> {
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Category name cannot be empty')),
+        const SnackBar(content: Text('A mező nem lehet üres!')),
       );
     }
   }
@@ -82,7 +82,7 @@ class _CategoryPageState extends State<CategoryPage> {
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Category deleted successfully')),
+        const SnackBar(content: Text('Sikeres törlés!')),
       );
       _fetchCategories(); // Update the state and rebuild the widget
     } else {
@@ -112,7 +112,7 @@ class _CategoryPageState extends State<CategoryPage> {
           return Container(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             margin: const EdgeInsets.symmetric(vertical: 12),
-            decoration: customBoxDeoration(AppColors.coolGrey, 10),
+            decoration: customBoxDeoration(AppColors.coolGrey, 18),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -142,7 +142,7 @@ class _CategoryPageState extends State<CategoryPage> {
                                   child: Container(
                               padding: const EdgeInsets.all(10),
                               decoration:
-                                  customBoxDeoration(AppColors.coolGrey, 10),
+                                  customBoxDeoration(AppColors.coolGrey, 18),
                               child: const Icon(
                                   Icons.arrow_circle_left_outlined,
                                   color: AppColors.antiFlashWhite,
@@ -155,7 +155,7 @@ class _CategoryPageState extends State<CategoryPage> {
                                   child: Container(
                               padding: const EdgeInsets.all(10),
                               decoration:
-                                  customBoxDeoration(AppColors.pantoneRed, 10),
+                                  customBoxDeoration(AppColors.pantoneRed, 18),
                               child: const Icon(
                                   Icons.delete_forever_rounded,
                                   color: AppColors.antiFlashWhite,
@@ -220,24 +220,10 @@ class _CategoryPageState extends State<CategoryPage> {
                 const SizedBox(height: 30),
                 Center(
                   child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(18),
-                      boxShadow: [
-                        BoxShadow(
-                          blurRadius: 10,
-                          color: Colors.black.withOpacity(0.8),
-                          offset: const Offset(0, 5),
-                        ),
-                      ],
-                    ),
+                    decoration: customBoxDeoration(AppColors.coolGrey, 18),
                     child: ElevatedButton(
                       onPressed: _saveCategory,
-                      style: ElevatedButton.styleFrom(
-                          fixedSize: const Size(90, 80),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(18)),
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          backgroundColor: AppColors.springBud),
+                      style: _buttonStyle(AppColors.springBud),
                       child: const Icon(Icons.save_rounded,
                           color: AppColors.spaceCadet, size: 50),
                     ),
@@ -311,3 +297,15 @@ BoxDecoration customBoxDeoration(Color color, double radius) {
     ],
   );
 }
+
+ButtonStyle _buttonStyle(Color color) {
+    return ElevatedButton.styleFrom(
+      elevation: 10,
+      shadowColor: Colors.black.withOpacity(0.8),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+      ),
+      padding: const EdgeInsets.all(16),
+      backgroundColor: color,
+    );
+  }
