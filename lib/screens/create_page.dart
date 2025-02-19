@@ -65,8 +65,10 @@ class _AddTaskPageState extends State<AddTaskPage> {
 
   Future<void> fetchCategories() async {
     try {
-      final QuerySnapshot snapshot =
-          await FirebaseFirestore.instance.collection('Categories').get();
+      final QuerySnapshot snapshot = await FirebaseFirestore.instance
+          .collection('Categories')
+          .where('userId', isEqualTo: _authService.getLoggedInUser()?.uid)
+          .get();
       setState(() {
         _categories =
             snapshot.docs.map((doc) => doc['name'] as String).toList();

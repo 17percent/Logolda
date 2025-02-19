@@ -156,49 +156,73 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       Container(
                         margin: const EdgeInsets.fromLTRB(20, 10, 20, 20),
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.fromLTRB(32, 16, 32, 16),
                         decoration:
                             customBoxDeoration(AppColors.antiFlashWhite, 18),
-                        child: Text('Hozd létre saját eseményeidet!',
+                        child: const Text('Indulhat a logolás!',
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                                color: AppColors.spaceCadet)),
+                                fontSize: 24,
+                                color: AppColors.spaceCadet),
+                            textAlign: TextAlign.center),
                       ),
-                      Divider(
+                      const Divider(
                         color: AppColors.antiFlashWhite,
                         thickness: 2,
                         indent: 35,
                         endIndent: 35,
                       ),
                       Container(
-                        margin: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-                        padding: const EdgeInsets.all(16),
-                        child: Text(
-                          'Az eseményeket kategóriákba rendezheted! Ne felejtsd el létrehozni a kategóriákat is, ha korábban még nem tetted!',
-                          style: TextStyle(
-                              fontSize: 16, color: AppColors.antiFlashWhite),
-                          textAlign: TextAlign.center,
+                        margin: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+                        padding: const EdgeInsets.fromLTRB(32, 16, 32, 16),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                               const Expanded(
+                                  child: Text(
+                                    'Első lépésben hozz létre új kategóriákat! ',
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        color: AppColors.antiFlashWhite),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                _buildActionButtons(
+                                    const Icon(Icons.category_rounded,
+                                        color: AppColors.antiFlashWhite,
+                                        size: 50), () async {
+                                  Navigator.pushNamed(context, '/category');
+                                }),
+                              ],
+                            ),
+                            const SizedBox(height: 30),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                               const Expanded(
+                                  child: Text(
+                                    'Ezt követően rögzítheted a feladataidat!',
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        color: AppColors.antiFlashWhite),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                // Create new task button
+                                _buildActionButtons(
+                                    const Icon(Icons.task_rounded,
+                                        color: AppColors.antiFlashWhite,
+                                        size: 50), () async {
+                                  Navigator.pushNamed(context, '/create');
+                                }),
+                              ],
+                            ),
+                          ],
                         ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          // Create new task button
-                          _buildActionButtons(
-                              const Icon(Icons.add_circle_outline_rounded,
-                                  color: AppColors.antiFlashWhite, size: 50),
-                              'Új esemény', () async{
-                            Navigator.pushNamed(context, '/create');
-                          }),
-                          // Create new category button
-                          _buildActionButtons(
-                              const Icon(Icons.add_circle_outline_rounded,
-                                  color: AppColors.antiFlashWhite, size: 50),
-                              'Új kategória', () async {
-                            Navigator.pushNamed(context, '/category');
-                          }),
-                        ],
                       ),
                     ],
                   );
@@ -309,7 +333,7 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-Widget _buildActionButtons(Icon icon, String title, Function onPressed) {
+Widget _buildActionButtons(Icon icon, Function onPressed) {
   return Column(
     children: [
       Container(
@@ -320,11 +344,6 @@ Widget _buildActionButtons(Icon icon, String title, Function onPressed) {
           onPressed: onPressed as void Function()?,
           style: _buttonStyle(AppColors.coolGrey),
         ),
-      ),
-      const SizedBox(height: 10),
-      Text(
-        title,
-        style: const TextStyle(fontSize: 16, color: AppColors.antiFlashWhite),
       ),
     ],
   );
