@@ -28,7 +28,7 @@ class _HomePageState extends State<HomePage> {
     'Közelgő': 0,
     'Függő': 0,
     'Lejárt': 0,
-    'Kesz': 0,
+    'Kész': 0,
   };
 
   @override
@@ -121,7 +121,7 @@ class _HomePageState extends State<HomePage> {
       'Közelgő': threeDaysLaterTasks,
       'Függő': futureTasks,
       'Lejárt': pastTasks,
-      'Kesz': doneTasks,
+      'Kész': doneTasks,
     };
   }
 
@@ -169,8 +169,8 @@ class _HomePageState extends State<HomePage> {
                       const Divider(
                         color: AppColors.antiFlashWhite,
                         thickness: 2,
-                        indent: 35,
-                        endIndent: 35,
+                        indent: 45,
+                        endIndent: 45,
                       ),
                       Container(
                         margin: const EdgeInsets.fromLTRB(0, 10, 0, 0),
@@ -324,7 +324,7 @@ class _HomePageState extends State<HomePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: _categorizedTasks.entries
-            .where((entry) => entry.key != 'Kesz')
+            .where((entry) => entry.key != 'Kész')
             .map((entry) {
           return TaskCategorySection(title: entry.key, tasks: entry.value);
         }).toList(),

@@ -43,42 +43,15 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                 bool? confirmDelete = await showDialog<bool>(
                   context: context,
                   builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: const Text('Törlés megerősítése',
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold)),
-                      content: const Text('Biztosan törlöd ezt az eseményt?'),
-                      actions: <Widget>[
-                        TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop(false);
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration:
-                                  customBoxDeoration(AppColors.coolGrey, 10),
-                              child: const Icon(
-                                  Icons.arrow_circle_left_outlined,
-                                  color: AppColors.antiFlashWhite,
-                                  size: 40),
-                            )),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop(true);
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration:
-                                customBoxDeoration(AppColors.pantoneRed, 10),
-                            child: const Icon(Icons.delete_forever_rounded,
-                                color: AppColors.antiFlashWhite, size: 40),
-                          ),
-                        ),
-                      ],
+                    return buildCustomAlertDialog(
+                      'Törlés megerősítése',
+                      'Biztosan törölni szeretnéd a feladatot?',
+                      AppColors.pantoneRed,
+                      const Icon(Icons.delete_forever_rounded,
+                          color: AppColors.antiFlashWhite, size: 40),
                     );
                   },
                 );
-
                 if (confirmDelete == true) {
                   await deleteTask(widget.task.id);
                   if (mounted) {
@@ -111,7 +84,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
             // Task title
             Container(
                 alignment: Alignment.center,
-                padding: const EdgeInsets.only(bottom: 10),
+                padding: const EdgeInsets.only(bottom: 20),
                 margin: const EdgeInsets.fromLTRB(10, 0, 10, 10),
                 decoration: BoxDecoration(
                   border: Border(
@@ -121,7 +94,8 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                 ),
                 child: Text(_task.title,
                     style: const TextStyle(
-                        fontSize: 28, color: AppColors.antiFlashWhite))),
+                        fontSize: 28, color: AppColors.antiFlashWhite),
+                    textAlign: TextAlign.center)),
             const SizedBox(height: 10),
             // Task description
             Container(
@@ -136,11 +110,11 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
               children: [
                 buildTaskDetailsContainer('Helyszín ', _task.location),
                 buildTaskDetailsContainer(
-                    'Kezdő dátum ', _task.startDate ?? 'N/A'),
+                    'Kezdő dátum ', _task.startDate?.substring(2) ?? 'N/A'),
                 buildTaskDetailsContainer(
                     'Kezdő időpont ', _task.startTime ?? 'N/A'),
                 buildTaskDetailsContainer(
-                    'Záró dátum ', _task.dueDate ?? 'N/A'),
+                    'Záró dátum ', _task.dueDate?.substring(2) ?? 'N/A'),
                 buildTaskDetailsContainer(
                     'Záró időpont ', _task.dueTime ?? 'N/A'),
                 buildTaskDetailsContainer('Kategória ', _task.category),
@@ -155,6 +129,37 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
     );
   }
 
+  Widget buildCustomAlertDialog(
+      String title, String content, Color color, Icon icon) {
+    return AlertDialog(
+      title: Text(title,
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+      content: Text(content),
+      actions: <Widget>[
+        TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(false);
+            },
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: customBoxDeoration(AppColors.coolGrey, 10),
+              child: const Icon(Icons.arrow_circle_left_outlined,
+                  color: AppColors.antiFlashWhite, size: 40),
+            )),
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop(true);
+          },
+          child: Container(
+            padding: const EdgeInsets.all(10),
+            decoration: customBoxDeoration(color, 10),
+            child: icon,
+          ),
+        ),
+      ],
+    );
+  }
+
   Row buildActionButtons() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -166,9 +171,23 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
           child: IconButton(
             icon: const Icon(Icons.check_circle_outline_rounded, size: 55),
             onPressed: () async {
-              await markTaskAsDone(widget.task.id);
-              await updateUserScore();
-            },
+                bool? confirmCompletion = await showDialog<bool>(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return buildCustomAlertDialog(
+                      'Archiválás megerősítése',
+                      'Biztosan archiválni szeretnéd a feladatot?',
+                      AppColors.springBud,
+                      const Icon(Icons.check_circle_outline_rounded,
+                          color: AppColors.spaceCadet, size: 40),
+                    );
+                  },
+                );
+                if (confirmCompletion == true) {
+                    await markTaskAsDone(widget.task.id);
+                    await updateUserScore();
+                }
+              },
             style: _buttonStyle(AppColors.springBud),
           ),
         ),
@@ -265,8 +284,13 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
   Future<void> deleteTask(String id) async {
     try {
       await _firestore.collection('Tasks').doc(id).delete();
+    if (mounted) {
+        Navigator.pushNamedAndRemoveUntil(
+            context, '/home', (Route<dynamic> route) => false);
+      }
+      _showSnackBar("Sikeres törlés!");
     } catch (e) {
-      _showSnackBar('Error deleting task: $e');
+      _showSnackBar('Sikertelen törlés: $e');
     }
   }
 }

@@ -209,7 +209,7 @@ Color getColorBasedOnStatus(String status) {
       return AppColors.orangePeel;
     case 'Lejárt':
       return AppColors.pantoneRed;
-    case 'Kesz':
+    case 'Kész':
       return AppColors.springBud;
     default:
       return AppColors.antiFlashWhite;

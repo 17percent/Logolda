@@ -31,7 +31,6 @@ class _AddTaskPageState extends State<AddTaskPage> {
   static String _formatTimeOfDay(TimeOfDay time) =>
       "${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}";
 
-  // Loading categories + difficulties when the widget is initialized
   @override
   void initState() {
     super.initState();
@@ -227,15 +226,23 @@ class _AddTaskPageState extends State<AddTaskPage> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildLabel("Kategória"),
-                    _buildDropDownForCategories(),
+                    Center(
+                      child: _buildLabel("Kategória"),
+                    ),
+                    Center(
+                      child: _buildDropDownForCategories(),
+                    ),
                   ],
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildLabel("Nehézség"),
-                    _buildDropDownForDifficulties(),
+                    Center(
+                      child: _buildLabel("Nehézség"),
+                    ),
+                    Center(
+                      child: _buildDropDownForDifficulties(),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 30),

@@ -408,15 +408,23 @@ class _ModifyPageState extends State<ModifyPage> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildLabel("Kategória"),
-                      _buildDropDownForCategories(),
+                      Center(
+                      child: _buildLabel("Kategória"),
+                    ),
+                     Center(
+                      child: _buildDropDownForCategories(),
+                    ),
                     ],
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildLabel("Nehézség"),
-                      _buildDropDownForDifficulties(),
+                      Center(
+                      child: _buildLabel("Nehézség"),
+                    ),
+                     Center(
+                      child: _buildDropDownForDifficulties(),
+                    ),
                     ],
                   ),
                   const SizedBox(height: 30),
