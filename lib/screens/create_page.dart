@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:logolda/util/colors.dart';
 import 'package:logolda/firebase/auth_handler.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:logolda/services/noti_service.dart';
 
 class AddTaskPage extends StatefulWidget {
   const AddTaskPage({super.key});
@@ -13,6 +14,7 @@ class AddTaskPage extends StatefulWidget {
 class _AddTaskPageState extends State<AddTaskPage> {
   final _authService = AuthService();
   final _firestore = FirebaseFirestore.instance;
+  final _notiService = NotiService();
   String? _currentUserId;
   var _categories = [];
   var _difficulties = [];
@@ -125,7 +127,31 @@ class _AddTaskPageState extends State<AddTaskPage> {
     }
 
     try {
+      // Creating new document for task
       final docRef = _firestore.collection('Tasks').doc();
+
+      // Scheduling notification for task
+      final scheduledDate = DateTime.parse('$taskStartDate');
+      final timeParts = _startTime!.split(':');
+      final scheduledTime = TimeOfDay(
+        hour: int.parse(timeParts[0]),
+        minute: int.parse(timeParts[1]),
+      );
+      final scheduledDateTime = DateTime(
+          scheduledDate.year,
+          scheduledDate.month,
+          scheduledDate.day,
+          scheduledTime.hour,
+          scheduledTime.minute).subtract(const Duration(minutes: 30));    
+
+      await _notiService.scheduleNotification(
+          id: docRef.id.hashCode,
+          title: taskTitle,
+          body:
+              'Hamarosan kezdődik az esemény! Tekintsd meg az alkalmazásban! ',
+          scheduledDate: scheduledDateTime);
+
+      // Adding task to Firestore    
       await docRef.set({
         'docid': docRef.id,
         'uid': _currentUserId,
@@ -138,8 +164,10 @@ class _AddTaskPageState extends State<AddTaskPage> {
         'dueTime': _dueTime,
         'category': _selectedCategory,
         'difficulty': _selectedDifficulty,
+        'notificationId': docRef.id.hashCode,
         'isDone': false
       });
+
       if (mounted) {
         // Taking user to Home page
         Navigator.pushReplacementNamed(context, '/home');
