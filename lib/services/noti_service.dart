@@ -99,10 +99,12 @@ class NotiService {
   // CANCEL ALL NOTIFICATION
   Future<void> cancelAllNotification() async {
     await notificationsPlugin.cancelAll();
+    print('Canceled all notifications!');
   }
 
   // CANCEL NOTIFICATION
   Future<void> cancelNotification(int id) async {
     await notificationsPlugin.cancel(id);
+    print('Canceled notification with id: $id');
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:logolda/util/colors.dart';
+import 'package:logolda/services/noti_service.dart';
 
 class ModifyPage extends StatefulWidget {
   final String taskId;
@@ -14,6 +15,8 @@ class ModifyPage extends StatefulWidget {
 class _ModifyPageState extends State<ModifyPage> {
   final _formKey = GlobalKey<FormState>();
   final _firestore = FirebaseFirestore.instance;
+  final _notiService = NotiService();
+
   var _categories = [];
   Map<String, int> _difficultiesAndScores = {};
   final TextEditingController _titleController = TextEditingController();
@@ -27,6 +30,7 @@ class _ModifyPageState extends State<ModifyPage> {
   String? _startTime;
   DateTime? _dueDate;
   String? _dueTime;
+  int? _notificationId;
 
   @override
   void initState() {
@@ -52,6 +56,7 @@ class _ModifyPageState extends State<ModifyPage> {
         _dueTime = task['dueTime'];
         _selectedCategory = task['category'];
         _selectedDifficulty = task['difficulty'];
+        _notificationId = task['notificationId'];
       });
     }
   }
@@ -73,6 +78,33 @@ class _ModifyPageState extends State<ModifyPage> {
       }
 
       try {
+        // Canceling the old notification
+        await _notiService.cancelNotification(_notificationId!);
+
+        // Scheduling a new notification
+        final scheduledDate =
+            DateTime.parse(_startDate!.toIso8601String().substring(0, 10));
+        final timeParts = _startTime!.split(':');
+        final scheduledTime = TimeOfDay(
+          hour: int.parse(timeParts[0]),
+          minute: int.parse(timeParts[1]),
+        );
+        final scheduledDateTime = DateTime(
+                scheduledDate.year,
+                scheduledDate.month,
+                scheduledDate.day,
+                scheduledTime.hour,
+                scheduledTime.minute)
+            .subtract(const Duration(minutes: 30));
+
+        await _notiService.scheduleNotification(
+          title: _titleController.text.trim(),
+          body: 'Hamarosan kezdődik az esemény! Tekintsd meg az alkalmazásban! ',
+          scheduledDate: scheduledDateTime,
+          id: _notificationId,
+        );
+
+        // adding task to database
         await _firestore.collection('Tasks').doc(widget.taskId).update({
           'title': _titleController.text.trim(),
           'description': _descriptionController.text.trim(),
@@ -83,6 +115,7 @@ class _ModifyPageState extends State<ModifyPage> {
           'dueTime': _dueTime,
           'category': _selectedCategory,
           'difficulty': _selectedDifficulty,
+          'notificationId': _notificationId,
         });
         if (mounted) {
           Navigator.pushNamedAndRemoveUntil(
@@ -409,22 +442,22 @@ class _ModifyPageState extends State<ModifyPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Center(
-                      child: _buildLabel("Kategória"),
-                    ),
-                     Center(
-                      child: _buildDropDownForCategories(),
-                    ),
+                        child: _buildLabel("Kategória"),
+                      ),
+                      Center(
+                        child: _buildDropDownForCategories(),
+                      ),
                     ],
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Center(
-                      child: _buildLabel("Nehézség"),
-                    ),
-                     Center(
-                      child: _buildDropDownForDifficulties(),
-                    ),
+                        child: _buildLabel("Nehézség"),
+                      ),
+                      Center(
+                        child: _buildDropDownForDifficulties(),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 30),

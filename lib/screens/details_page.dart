@@ -4,6 +4,8 @@ import 'package:logolda/util/colors.dart';
 import 'package:logolda/models/task.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:logolda/firebase/auth_handler.dart';
+import 'package:logolda/services/noti_service.dart';
+import 'package:logolda/services/textAnalytics_service.dart';
 
 class TaskDetailsPage extends StatefulWidget {
   const TaskDetailsPage({super.key, required this.task, required this.title});
@@ -18,6 +20,8 @@ class TaskDetailsPage extends StatefulWidget {
 class _TaskDetailsPageState extends State<TaskDetailsPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final AuthService _authService = AuthService();
+  final _notiService = NotiService();
+  final _textAnalyticsService = TextanalyticsService();
   Map<String, int> _difficultiesAndScores = {};
   late Task _task;
   late String _title;
@@ -53,12 +57,9 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                   },
                 );
                 if (confirmDelete == true) {
+                  await _notiService
+                      .cancelNotification(widget.task.notificationId);
                   await deleteTask(widget.task.id);
-                  if (mounted) {
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                        '/home', (Route<dynamic> route) => false);
-                    _showSnackBar("Sikeres törlés!");
-                  }
                 }
               }),
         ],
@@ -108,17 +109,17 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
             // Task details
             Column(
               children: [
-                buildTaskDetailsContainer('Helyszín ', _task.location),
-                buildTaskDetailsContainer(
-                    'Kezdő dátum ', _task.startDate?.substring(2) ?? 'N/A'),
-                buildTaskDetailsContainer(
-                    'Kezdő időpont ', _task.startTime ?? 'N/A'),
-                buildTaskDetailsContainer(
-                    'Záró dátum ', _task.dueDate?.substring(2) ?? 'N/A'),
-                buildTaskDetailsContainer(
-                    'Záró időpont ', _task.dueTime ?? 'N/A'),
-                buildTaskDetailsContainer('Kategória ', _task.category),
-                buildTaskDetailsContainer('Nehézség ', _task.difficulty),
+                buildTaskDetailsContainer('Helyszín', _task.location),
+                buildTaskDateAndTimeContainer(
+                    'Kezdődik',
+                    _task.startDate?.substring(2) ?? 'N/A',
+                    '${_task.startTime ?? 'N/A'} ${DateTime.now().timeZoneName}'),
+                buildTaskDateAndTimeContainer(
+                    'Végződik',
+                    _task.dueDate?.substring(2) ?? 'N/A',
+                    '${_task.dueTime ?? 'N/A'} ${DateTime.now().timeZoneName}'),
+                buildTaskDetailsContainer('Kategória', _task.category),
+                buildTaskDetailsContainer('Nehézség', _task.difficulty),
                 const SizedBox(height: 30),
                 if (!_task.isDone) buildActionButtons(),
               ],
@@ -171,23 +172,23 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
           child: IconButton(
             icon: const Icon(Icons.check_circle_outline_rounded, size: 55),
             onPressed: () async {
-                bool? confirmCompletion = await showDialog<bool>(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return buildCustomAlertDialog(
-                      'Archiválás megerősítése',
-                      'Biztosan archiválni szeretnéd a feladatot?',
-                      AppColors.springBud,
-                      const Icon(Icons.check_circle_outline_rounded,
-                          color: AppColors.spaceCadet, size: 40),
-                    );
-                  },
-                );
-                if (confirmCompletion == true) {
-                    await markTaskAsDone(widget.task.id);
-                    await updateUserScore();
-                }
-              },
+              bool? confirmCompletion = await showDialog<bool>(
+                context: context,
+                builder: (BuildContext context) {
+                  return buildCustomAlertDialog(
+                    'Archiválás megerősítése',
+                    'Biztosan archiválni szeretnéd a feladatot?',
+                    AppColors.springBud,
+                    const Icon(Icons.check_circle_outline_rounded,
+                        color: AppColors.spaceCadet, size: 40),
+                  );
+                },
+              );
+              if (confirmCompletion == true) {
+                await markTaskAsDone(widget.task.id);
+                await updateUserScore();
+              }
+            },
             style: _buttonStyle(AppColors.springBud),
           ),
         ),
@@ -217,6 +218,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                     dueTime: result['dueTime'],
                     category: result['category'],
                     difficulty: result['difficulty'],
+                    notificationId: result['notificationId'],
                     isDone: result['isDone'],
                   );
                 });
@@ -243,6 +245,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
       await _firestore.collection('Tasks').doc(taskId).update({
         'isDone': true,
       });
+      await _notiService.cancelNotification(widget.task.notificationId);
       if (mounted) {
         Navigator.pushNamedAndRemoveUntil(
             context, '/home', (Route<dynamic> route) => false);
@@ -253,12 +256,24 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
     }
   }
 
+  num calculateUserScore(String desc) {
+    final smog = _textAnalyticsService.calculateSMOGIndex(desc);
+    final cl = _textAnalyticsService.calculateColemanLiauIndex(desc);
+    final diffScore = _difficultiesAndScores[_task.difficulty] as num;
+    final weight = (smog + cl) / 2;
+    final finalScore = diffScore * weight as num;
+    return finalScore;
+  }
+
   Future<void> updateUserScore() async {
     final userid = _authService.getLoggedInUser()?.uid;
+    var finalScore = calculateUserScore(_task.description);
+    if (finalScore <= 0) {
+      finalScore = _difficultiesAndScores[_task.difficulty] as num;
+    }
     try {
       await _firestore.collection('Users').doc(userid).update({
-        'seeds': FieldValue.increment(
-            _difficultiesAndScores[_task.difficulty] as num),
+        'seeds': FieldValue.increment(finalScore),
       });
     } catch (e) {
       _showSnackBar('Error updating user score: $e');
@@ -284,7 +299,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
   Future<void> deleteTask(String id) async {
     try {
       await _firestore.collection('Tasks').doc(id).delete();
-    if (mounted) {
+      if (mounted) {
         Navigator.pushNamedAndRemoveUntil(
             context, '/home', (Route<dynamic> route) => false);
       }
@@ -295,22 +310,20 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
   }
 }
 
-Container buildTaskDetailsContainer(String taskTitle, String value) {
+Container buildTaskDetailsContainer(String title, String value) {
   return Container(
     margin: const EdgeInsets.all(10),
-    padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+    padding: const EdgeInsets.fromLTRB(10, 1, 0, 1),
     decoration: customBoxDeoration(AppColors.coolGrey, 18),
     child: Row(
       children: [
-        Text(taskTitle,
+        Text(title,
             style:
-                const TextStyle(fontSize: 16, color: AppColors.antiFlashWhite),
-            softWrap: true,
-            overflow: TextOverflow.visible),
+                const TextStyle(fontSize: 16, color: AppColors.antiFlashWhite)),
         const SizedBox(width: 15),
         Expanded(
           child: Container(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(15),
             decoration: const BoxDecoration(
               color: AppColors.antiFlashWhite,
               borderRadius: BorderRadius.only(
@@ -325,6 +338,54 @@ Container buildTaskDetailsContainer(String taskTitle, String value) {
                 softWrap: true,
                 overflow: TextOverflow.visible,
                 textAlign: TextAlign.right),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+Container buildTaskDateAndTimeContainer(
+    String title, String date, String time) {
+  return Container(
+    margin: const EdgeInsets.all(10),
+    padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+    decoration: customBoxDeoration(AppColors.coolGrey, 18),
+    child: Row(
+      children: [
+        Text(title,
+            style:
+                const TextStyle(fontSize: 16, color: AppColors.antiFlashWhite)),
+        const SizedBox(width: 15),
+        Expanded(
+          child: Container(
+            padding: const EdgeInsets.all(15),
+            decoration: const BoxDecoration(
+              color: AppColors.antiFlashWhite,
+              borderRadius: BorderRadius.only(
+                topRight: Radius.circular(18),
+                bottomRight: Radius.circular(18),
+              ),
+            ),
+            alignment: Alignment.centerRight,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(date,
+                    style: const TextStyle(
+                        fontSize: 16, color: AppColors.spaceCadet),
+                    softWrap: true,
+                    overflow: TextOverflow.visible,
+                    textAlign: TextAlign.right),
+                const Divider(color: AppColors.spaceCadet, thickness: 1),
+                Text(time,
+                    style: const TextStyle(
+                        fontSize: 16, color: AppColors.spaceCadet),
+                    softWrap: true,
+                    overflow: TextOverflow.visible,
+                    textAlign: TextAlign.right),
+              ],
+            ),
           ),
         ),
       ],

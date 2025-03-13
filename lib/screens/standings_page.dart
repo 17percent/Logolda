@@ -158,7 +158,7 @@ class _StandingsPageState extends State<StandingsPage> {
           ),
           Expanded(
           child: Text(
-            entry.value['seed'].toString(),
+            entry.value['seed'].floor().toString(),
             textAlign: TextAlign.center,
             style: const TextStyle(color: AppColors.spaceCadet, fontSize: 16),
           ),

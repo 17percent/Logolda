@@ -130,7 +130,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       color: AppColors.coolGrey),
                                   const SizedBox(width: 5),
                                   Text(
-                                    '${userData['seeds']}',
+                                    '${userData['seeds'].floor()}',
                                     style: const TextStyle(
                                         color: AppColors.spaceCadet,
                                         fontSize: 20),

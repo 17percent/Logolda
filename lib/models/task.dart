@@ -9,6 +9,7 @@ class Task {
   final String? dueTime;
   final String category;
   final String difficulty;
+  final int notificationId;
   final bool isDone;
 
   Task({
@@ -22,6 +23,7 @@ class Task {
     required this.dueTime,
     required this.category,
     required this.difficulty,
+    required this.notificationId,
     required this.isDone,
   });
 
@@ -38,6 +40,7 @@ class Task {
       dueTime: map['dueTime'],
       category: map['category'],
       difficulty: map['difficulty'],
+      notificationId: map['notificationId'],
       isDone: map['isDone'],
     );
   }
