@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:logolda/util/colors.dart';
+import 'package:logolda/util/styles.dart';
 import 'package:logolda/firebase/auth_handler.dart';
 
 class LoginPage extends StatefulWidget {
@@ -13,6 +14,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final AuthService _authService = AuthService();
+  bool _obscureText = true;
 
   void _login() async {
     final email = _emailController.text;
@@ -97,18 +99,7 @@ class _LoginPageState extends State<LoginPage> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(18),
-              boxShadow: [
-                BoxShadow(
-                  blurRadius: 10,
-                  blurStyle: BlurStyle.normal,
-                  color: Colors.black.withOpacity(0.8),
-                  offset: const Offset(0, 5),
-                  spreadRadius: 0,
-                ),
-              ],
-            ),
+            decoration: AppStyles.customBoxDecoration(AppColors.antiFlashWhite, 18),
             child: TextField(
               controller: _emailController,
               decoration: InputDecoration(
@@ -138,18 +129,7 @@ class _LoginPageState extends State<LoginPage> {
           ),
           const SizedBox(height: 20),
           Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(18),
-              boxShadow: [
-                BoxShadow(
-                  blurRadius: 10,
-                  blurStyle: BlurStyle.normal,
-                  color: Colors.black.withOpacity(0.8),
-                  offset: const Offset(0, 5),
-                  spreadRadius: 0,
-                ),
-              ],
-            ),
+            decoration: AppStyles.customBoxDecoration(AppColors.antiFlashWhite, 18),
             child: TextField(
               controller: _passwordController,
               decoration: InputDecoration(
@@ -173,34 +153,28 @@ class _LoginPageState extends State<LoginPage> {
                 filled: true,
                 prefixIcon:
                     const Icon(Icons.password, color: AppColors.coolGrey),
+              suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscureText ? Icons.visibility : Icons.visibility_off,
+                      color: AppColors.coolGrey,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscureText = !_obscureText;
+                      });
+                    },
+                  ),
               ),
-              obscureText: true,
+              obscureText: _obscureText,
             ),
           ),
           const SizedBox(height: 30),
           Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(18),
-              boxShadow: [
-                BoxShadow(
-                  blurRadius: 10,
-                  blurStyle: BlurStyle.normal,
-                  color: Colors.black.withOpacity(0.8),
-                  offset: const Offset(0, 5),
-                  spreadRadius: 0,
-                ),
-              ],
-            ),
+            decoration: AppStyles.customBoxDecoration(AppColors.antiFlashWhite, 18),
             child: ElevatedButton(
               onPressed: _login,
-              style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18)),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  backgroundColor: AppColors.coolGrey),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: const Icon(Icons.login_rounded, size: 50, color: AppColors.antiFlashWhite)),
+              style: AppStyles.customButtonStyle(AppColors.coolGrey),
+              child: const Icon(Icons.login_rounded, size: 50, color: AppColors.antiFlashWhite),
             ),
           ),
         ],

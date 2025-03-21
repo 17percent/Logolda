@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:logolda/util/colors.dart';
 import 'package:logolda/firebase/auth_handler.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:logolda/util/styles.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -18,6 +19,7 @@ class _SignupPageState extends State<SignupPage> {
       TextEditingController();
   final AuthService _authService = AuthService();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  bool _obscureText = true;
 
   void _register() async {
     final username = _usernameController.text;
@@ -140,18 +142,7 @@ class _SignupPageState extends State<SignupPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(18),
-                boxShadow: [
-                  BoxShadow(
-                    blurRadius: 10,
-                    blurStyle: BlurStyle.normal,
-                    color: Colors.black.withOpacity(0.8),
-                    offset: const Offset(0, 5),
-                    spreadRadius: 0,
-                  ),
-                ],
-              ),
+              decoration: AppStyles.customBoxDecoration(AppColors.antiFlashWhite, 18),
               child: TextField(
                 controller: _usernameController,
                 decoration: InputDecoration(
@@ -182,18 +173,7 @@ class _SignupPageState extends State<SignupPage> {
             ),
             const SizedBox(height: 20),
             Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(18),
-                boxShadow: [
-                  BoxShadow(
-                    blurRadius: 10,
-                    blurStyle: BlurStyle.normal,
-                    color: Colors.black.withOpacity(0.8),
-                    offset: const Offset(0, 5),
-                    spreadRadius: 0,
-                  ),
-                ],
-              ),
+              decoration: AppStyles.customBoxDecoration(AppColors.antiFlashWhite, 18),
               child: TextField(
                 controller: _emailController,
                 decoration: InputDecoration(
@@ -224,18 +204,7 @@ class _SignupPageState extends State<SignupPage> {
             ),
             const SizedBox(height: 20),
             Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(18),
-                boxShadow: [
-                  BoxShadow(
-                    blurRadius: 10,
-                    blurStyle: BlurStyle.normal,
-                    color: Colors.black.withOpacity(0.8),
-                    offset: const Offset(0, 5),
-                    spreadRadius: 0,
-                  ),
-                ],
-              ),
+              decoration: AppStyles.customBoxDecoration(AppColors.antiFlashWhite, 18),
               child: TextField(
                 controller: _passwordController,
                 decoration: InputDecoration(
@@ -261,24 +230,24 @@ class _SignupPageState extends State<SignupPage> {
                   filled: true,
                   prefixIcon:
                       const Icon(Icons.password, color: AppColors.coolGrey),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscureText ? Icons.visibility : Icons.visibility_off,
+                      color: AppColors.coolGrey,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscureText = !_obscureText;
+                      });
+                    },
+                  ),
                 ),
-                obscureText: true,
+                obscureText: _obscureText,
               ),
             ),
             const SizedBox(height: 20),
             Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(18),
-                boxShadow: [
-                  BoxShadow(
-                    blurRadius: 10,
-                    blurStyle: BlurStyle.normal,
-                    color: Colors.black.withOpacity(0.8),
-                    offset: const Offset(0, 5),
-                    spreadRadius: 0,
-                  ),
-                ],
-              ),
+              decoration: AppStyles.customBoxDecoration(AppColors.antiFlashWhite, 18),
               child: TextField(
                 controller: _confirmedPasswordController,
                 decoration: InputDecoration(
@@ -304,36 +273,29 @@ class _SignupPageState extends State<SignupPage> {
                   filled: true,
                   prefixIcon:
                       const Icon(Icons.password, color: AppColors.coolGrey),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscureText ? Icons.visibility : Icons.visibility_off,
+                      color: AppColors.coolGrey,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscureText = !_obscureText;
+                      });
+                    },
+                  ),
                 ),
-                obscureText: true,
+                obscureText: _obscureText,
               ),
             ),
             const SizedBox(height: 30),
             Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(18),
-                boxShadow: [
-                  BoxShadow(
-                    blurRadius: 10,
-                    blurStyle: BlurStyle.normal,
-                    color: Colors.black.withOpacity(0.8),
-                    offset: const Offset(0, 5),
-                    spreadRadius: 0,
-                  ),
-                ],
-              ),
+              decoration: AppStyles.customBoxDecoration(AppColors.antiFlashWhite, 18),
               child: ElevatedButton(
                 onPressed: _register,
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18)),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  backgroundColor: AppColors.coolGrey,
-                ),
-                child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: const Icon(Icons.check_rounded,
-                        size: 50, color: AppColors.antiFlashWhite)),
+                style: AppStyles.customButtonStyle(AppColors.coolGrey),
+                child: const Icon(Icons.check_rounded,
+                    size: 50, color: AppColors.antiFlashWhite),
               ),
             ),
           ],

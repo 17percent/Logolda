@@ -9,6 +9,7 @@ import 'package:logolda/screens/category_page.dart';
 import 'package:logolda/screens/register_page.dart';
 import 'package:logolda/screens/archive_page.dart';
 import 'package:logolda/screens/standings_page.dart';
+import 'package:logolda/screens/intro_page.dart';
 import 'package:logolda/services/noti_service.dart';
 
 void main() async {
@@ -55,6 +56,7 @@ class MyApp extends StatelessWidget {
         '/archive': (context) => const ArchivePage(),
         '/category': (context) => const CategoryPage(),
         '/standings': (context) => const StandingsPage(),
+        '/intro': (context) => const IntroPage(),
       },
     );
   }

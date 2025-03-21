@@ -129,6 +129,8 @@ class _ArchivePageState extends State<ArchivePage> {
               () => Navigator.pushNamed(context, '/archive')),
           _buildDrawerItem('Eredménytábla', Icons.leaderboard_rounded,
               () => Navigator.pushNamed(context, '/standings')),
+          _buildDrawerItem('Bevezető', Icons.school_rounded,
+              () => Navigator.pushNamed(context, '/intro')),
           _buildDrawerItem('Kijelentkezés', Icons.logout_rounded, () {
             _authService.signOut();
             Navigator.pushReplacementNamed(context, '/');

@@ -177,50 +177,22 @@ class _HomePageState extends State<HomePage> {
                         padding: const EdgeInsets.fromLTRB(32, 16, 32, 16),
                         child: Column(
                           children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                               const Expanded(
-                                  child: Text(
-                                    'Első lépésben hozz létre új kategóriákat! ',
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        color: AppColors.antiFlashWhite),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                                const SizedBox(height: 10),
-                                _buildActionButtons(
-                                    const Icon(Icons.category_rounded,
-                                        color: AppColors.antiFlashWhite,
-                                        size: 50), () async {
-                                  Navigator.pushNamed(context, '/category');
-                                }),
-                              ],
+                            Container(
+                              margin: const EdgeInsets.fromLTRB(10, 0, 10, 20),
+                              child: const Text(
+                                  'Az első lépések megkezdéséhez tekintsd meg a bevezetőt!',
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      color: AppColors.antiFlashWhite),
+                                  textAlign: TextAlign.center),
                             ),
-                            const SizedBox(height: 30),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                               const Expanded(
-                                  child: Text(
-                                    'Ezt követően rögzítheted a feladataidat!',
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        color: AppColors.antiFlashWhite),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                                const SizedBox(height: 10),
-                                // Create new task button
-                                _buildActionButtons(
-                                    const Icon(Icons.task_rounded,
-                                        color: AppColors.antiFlashWhite,
-                                        size: 50), () async {
-                                  Navigator.pushNamed(context, '/create');
-                                }),
-                              ],
-                            ),
+                            const SizedBox(height: 10),
+                            _buildActionButtons(
+                                const Icon(Icons.school_rounded,
+                                    color: AppColors.antiFlashWhite,
+                                    size: 50), () async {
+                              Navigator.pushNamed(context, '/intro');
+                            }),
                           ],
                         ),
                       ),
@@ -282,6 +254,8 @@ class _HomePageState extends State<HomePage> {
               () => Navigator.pushNamed(context, '/archive')),
           _buildDrawerItem('Eredménytábla', Icons.leaderboard_rounded,
               () => Navigator.pushNamed(context, '/standings')),
+          _buildDrawerItem('Bevezető', Icons.school_rounded,
+              () => Navigator.pushNamed(context, '/intro')),
           _buildDrawerItem('Kijelentkezés', Icons.logout_rounded, () {
             _authService.signOut();
             Navigator.pushReplacementNamed(context, '/');
