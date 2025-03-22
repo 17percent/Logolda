@@ -69,14 +69,55 @@ class _IntroPageState extends State<IntroPage> {
           borderRadius: BorderRadius.circular(25),
         ),
       ),
-      controlsPadding: const EdgeInsets.fromLTRB(30, 0, 30, 50),
+      controlsPadding: const EdgeInsets.fromLTRB(30, 10, 30, 30),
       pages: [
+        // Page One
         PageViewModel(
-          title: 'Page One',
-          bodyWidget: const Column(
-            children: [
-              Text('This is a simple intro page'),
-            ],
+          titleWidget: Container(
+            alignment: Alignment.center,
+            margin: const EdgeInsets.fromLTRB(20, 30, 20, 10),
+            child: const Column(
+              children: [
+                Text(
+                  'Kategóriák',
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.antiFlashWhite,
+                  ),
+                ),
+                SizedBox(height: 10),
+                Divider(
+                  color: AppColors.antiFlashWhite,
+                  thickness: 2
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'Első lépésben hozz létre új kategóriákat, amelyek segítenek majd rendszerezni a feladataidat! ',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: AppColors.antiFlashWhite,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          bodyWidget: Container(
+            alignment: Alignment.center,
+            margin: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+            child: Column(
+              children: [
+                Image.asset('assets/tutorial_page1.png', fit: BoxFit.fitWidth),
+                const SizedBox(height: 30),
+                const Text('Ezt követően tudsz majd a feladataidhoz kategóriát hozzárendelni!',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: AppColors.antiFlashWhite,
+                    ),
+                    textAlign: TextAlign.center,
+                    ),
+              ],
+            ),
           ),
         ),
         PageViewModel(

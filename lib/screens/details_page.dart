@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:logolda/screens/modify_page.dart';
 import 'package:logolda/util/colors.dart';
+import 'package:logolda/util/styles.dart';
+import 'package:logolda/util/alerts.dart';
 import 'package:logolda/models/task.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:logolda/firebase/auth_handler.dart';
@@ -52,7 +54,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                       'Biztosan törölni szeretnéd a feladatot?',
                       AppColors.pantoneRed,
                       const Icon(Icons.delete_forever_rounded,
-                          color: AppColors.antiFlashWhite, size: 40),
+                          color: AppColors.antiFlashWhite, size: 36),
                     );
                   },
                 );
@@ -90,7 +92,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                 decoration: BoxDecoration(
                   border: Border(
                     bottom: BorderSide(
-                        color: getColorBasedOnStatus(_title), width: 2),
+                        color: AppStyles.getColorBasedOnStatus(_title), width: 2),
                   ),
                 ),
                 child: Text(_task.title,
@@ -143,9 +145,9 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
             },
             child: Container(
               padding: const EdgeInsets.all(10),
-              decoration: customBoxDeoration(AppColors.coolGrey, 10),
+              decoration: AppStyles.customBoxDecoration(AppColors.coolGrey, 18),
               child: const Icon(Icons.arrow_circle_left_outlined,
-                  color: AppColors.antiFlashWhite, size: 40),
+                  color: AppColors.antiFlashWhite, size: 36),
             )),
         TextButton(
           onPressed: () {
@@ -153,7 +155,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
           },
           child: Container(
             padding: const EdgeInsets.all(10),
-            decoration: customBoxDeoration(color, 10),
+            decoration: AppStyles.customBoxDecoration(color, 18),
             child: icon,
           ),
         ),
@@ -168,9 +170,9 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
         // Check button
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 20),
-          decoration: customBoxDeoration(AppColors.springBud, 18),
+          decoration: AppStyles.customBoxDecoration(AppColors.springBud, 18),
           child: IconButton(
-            icon: const Icon(Icons.check_circle_outline_rounded, size: 55),
+            icon: const Icon(Icons.check_circle_outline_rounded, size: 50),
             onPressed: () async {
               bool? confirmCompletion = await showDialog<bool>(
                 context: context,
@@ -180,7 +182,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                     'Biztosan archiválni szeretnéd a feladatot?',
                     AppColors.springBud,
                     const Icon(Icons.check_circle_outline_rounded,
-                        color: AppColors.spaceCadet, size: 40),
+                        color: AppColors.spaceCadet, size: 36),
                   );
                 },
               );
@@ -189,14 +191,14 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                 await updateUserScore();
               }
             },
-            style: _buttonStyle(AppColors.springBud),
+            style: AppStyles.customButtonStyle(AppColors.springBud),
           ),
         ),
         const SizedBox(width: 10),
         // Edit button
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 20),
-          decoration: customBoxDeoration(AppColors.coolGrey, 18),
+          decoration: AppStyles.customBoxDecoration(AppColors.coolGrey, 18),
           child: IconButton(
             icon: const Icon(Icons.edit, size: 50),
             onPressed: () async {
@@ -225,7 +227,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
               }
             },
             color: AppColors.antiFlashWhite,
-            style: _buttonStyle(AppColors.coolGrey),
+            style: AppStyles.customButtonStyle(AppColors.coolGrey),
           ),
         ),
       ],
@@ -314,7 +316,7 @@ Container buildTaskDetailsContainer(String title, String value) {
   return Container(
     margin: const EdgeInsets.all(10),
     padding: const EdgeInsets.fromLTRB(10, 1, 0, 1),
-    decoration: customBoxDeoration(AppColors.coolGrey, 18),
+    decoration: AppStyles.customBoxDecoration(AppColors.coolGrey, 18),
     child: Row(
       children: [
         Text(title,
@@ -350,7 +352,7 @@ Container buildTaskDateAndTimeContainer(
   return Container(
     margin: const EdgeInsets.all(10),
     padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-    decoration: customBoxDeoration(AppColors.coolGrey, 18),
+    decoration: AppStyles.customBoxDecoration(AppColors.coolGrey, 18),
     child: Row(
       children: [
         Text(title,
@@ -391,49 +393,4 @@ Container buildTaskDateAndTimeContainer(
       ],
     ),
   );
-}
-
-ButtonStyle _buttonStyle(Color color) {
-  return ElevatedButton.styleFrom(
-    elevation: 10,
-    shadowColor: Colors.black.withOpacity(0.8),
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(18),
-    ),
-    padding: const EdgeInsets.all(16),
-    backgroundColor: color,
-  );
-}
-
-BoxDecoration customBoxDeoration(Color color, double radius) {
-  return BoxDecoration(
-    borderRadius: BorderRadius.circular(radius),
-    color: color,
-    boxShadow: [
-      BoxShadow(
-        blurRadius: 10,
-        blurStyle: BlurStyle.normal,
-        color: Colors.black.withOpacity(0.5),
-        offset: const Offset(0, 5),
-        spreadRadius: 0,
-      )
-    ],
-  );
-}
-
-Color getColorBasedOnStatus(String status) {
-  switch (status) {
-    case 'Esedékes':
-      return AppColors.amethystPurple;
-    case 'Közelgő':
-      return AppColors.goldYellow;
-    case 'Függő':
-      return AppColors.orangePeel;
-    case 'Lejárt':
-      return AppColors.pantoneRed;
-    case 'Kész':
-      return AppColors.springBud;
-    default:
-      return AppColors.antiFlashWhite;
-  }
 }

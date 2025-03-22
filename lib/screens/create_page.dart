@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:logolda/util/colors.dart';
+import 'package:logolda/util/styles.dart';
+import 'package:logolda/util/alerts.dart';
 import 'package:logolda/firebase/auth_handler.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:logolda/services/noti_service.dart';
@@ -76,7 +78,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
         _isLoadingCategories = false; // Update loading state
       });
     } catch (e) {
-      _showSnackBar('Error fetching categories: $e');
+      AppAlerts.showSnackBar(context, 'Error fetching categories: $e');
       setState(() {
         _isLoadingCategories = false; // Stop loading spinner even on error
       });
@@ -98,7 +100,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
         _isLoadingDifficulties = false; // Update loading state
       });
     } catch (e) {
-      _showSnackBar('Error fetching difficulties: $e');
+      AppAlerts.showSnackBar(context, 'Error fetching difficulties: $e');
       setState(() {
         _isLoadingDifficulties = false; // Stop loading spinner even on error
       });
@@ -117,12 +119,12 @@ class _AddTaskPageState extends State<AddTaskPage> {
         taskLocation.isEmpty ||
         _selectedCategory == null ||
         _selectedDifficulty == null) {
-      _showSnackBar('Minden mező kitöltése kötelező!');
+      AppAlerts.showSnackBar(context, 'Minden mező kitöltése kötelező!');
       return;
     }
 
     if (_startDate!.isAfter(_dueDate!)) {
-      _showSnackBar("Az esemény nem kezdőthet később a határidőnél!");
+      AppAlerts.showSnackBar(context, "Az esemény nem kezdőthet később a határidőnél!");
       return;
     }
 
@@ -138,11 +140,12 @@ class _AddTaskPageState extends State<AddTaskPage> {
         minute: int.parse(timeParts[1]),
       );
       final scheduledDateTime = DateTime(
-          scheduledDate.year,
-          scheduledDate.month,
-          scheduledDate.day,
-          scheduledTime.hour,
-          scheduledTime.minute).subtract(const Duration(minutes: 30));    
+              scheduledDate.year,
+              scheduledDate.month,
+              scheduledDate.day,
+              scheduledTime.hour,
+              scheduledTime.minute)
+          .subtract(const Duration(minutes: 30));
 
       await _notiService.scheduleNotification(
           id: docRef.id.hashCode,
@@ -151,7 +154,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
               'Hamarosan kezdődik az esemény! Tekintsd meg az alkalmazásban! ',
           scheduledDate: scheduledDateTime);
 
-      // Adding task to Firestore    
+      // Adding task to Firestore
       await docRef.set({
         'docid': docRef.id,
         'uid': _currentUserId,
@@ -172,18 +175,10 @@ class _AddTaskPageState extends State<AddTaskPage> {
         // Taking user to Home page
         Navigator.pushReplacementNamed(context, '/home');
         // Sending info to screen
-        _showSnackBar("Sikeres létrehozás!");
+        AppAlerts.showSnackBar(context, "Sikeres létrehozás!");
       }
     } catch (e) {
-      _showSnackBar('Failed to add task: $e');
-    }
-  }
-
-  void _showSnackBar(String message) {
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)),
-      );
+      AppAlerts.showSnackBar(context, 'Failed to add task: $e');
     }
   }
 
@@ -254,23 +249,15 @@ class _AddTaskPageState extends State<AddTaskPage> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Center(
-                      child: _buildLabel("Kategória"),
-                    ),
-                    Center(
-                      child: _buildDropDownForCategories(),
-                    ),
+                    _buildLabel("Kategória"),
+                    _buildDropDownForCategories(),
                   ],
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Center(
-                      child: _buildLabel("Nehézség"),
-                    ),
-                    Center(
-                      child: _buildDropDownForDifficulties(),
-                    ),
+                    _buildLabel("Nehézség"),
+                    _buildDropDownForDifficulties(),
                   ],
                 ),
                 const SizedBox(height: 30),
@@ -278,10 +265,11 @@ class _AddTaskPageState extends State<AddTaskPage> {
                   padding: const EdgeInsets.only(bottom: 32),
                   child: Center(
                     child: Container(
-                      decoration: customBoxDeoration(AppColors.springBud, 18),
+                      decoration: AppStyles.customBoxDecoration(
+                          AppColors.springBud, 18),
                       child: ElevatedButton(
                         onPressed: _addTaskToFirestore,
-                        style: _buttonStyle(AppColors.springBud),
+                        style: AppStyles.customButtonStyle(AppColors.springBud),
                         child: const Icon(Icons.save_rounded,
                             color: AppColors.spaceCadet, size: 50),
                       ),
@@ -308,7 +296,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
   Widget _buildTextField(TextEditingController controller, String hint,
       {int maxLines = 1}) {
     return Container(
-      decoration: customBoxDeoration(AppColors.antiFlashWhite, 18),
+      decoration: AppStyles.customBoxDecoration(AppColors.antiFlashWhite, 18),
       child: TextField(
         controller: controller,
         maxLines: maxLines,
@@ -338,8 +326,9 @@ class _AddTaskPageState extends State<AddTaskPage> {
         _isLoadingCategories
             ? const CircularProgressIndicator(color: AppColors.springBud)
             : Container(
-                padding: const EdgeInsets.all(16),
-                decoration: customBoxDeoration(AppColors.antiFlashWhite, 18),
+                padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
+                decoration:
+                    AppStyles.customBoxDecoration(AppColors.antiFlashWhite, 18),
                 child: DropdownButton<String>(
                   value: _selectedCategory,
                   hint: const Icon(
@@ -368,6 +357,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
                       color: Colors.black,
                       fontSize: 16,
                       fontFamily: "Michroma"),
+                  isExpanded: true,
                 ),
               ),
         const SizedBox(height: 16),
@@ -382,8 +372,9 @@ class _AddTaskPageState extends State<AddTaskPage> {
         _isLoadingDifficulties
             ? const CircularProgressIndicator(color: AppColors.springBud)
             : Container(
-                padding: const EdgeInsets.all(16),
-                decoration: customBoxDeoration(AppColors.antiFlashWhite, 18),
+                padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
+                decoration:
+                    AppStyles.customBoxDecoration(AppColors.antiFlashWhite, 18),
                 child: DropdownButton<String>(
                   value: _selectedDifficulty,
                   hint: const Icon(
@@ -412,6 +403,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
                       color: Colors.black,
                       fontSize: 16,
                       fontFamily: "Michroma"),
+                  isExpanded: true,
                 ),
               ),
         const SizedBox(height: 16),
@@ -427,29 +419,35 @@ class _AddTaskPageState extends State<AddTaskPage> {
     ValueChanged<String> onTimePicked,
   ) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Container(
-          decoration: customBoxDeoration(AppColors.antiFlashWhite, 18),
-          child: ElevatedButton(
-            onPressed: () => _pickDate(context, date, onDatePicked),
-            style: _buttonStyle(AppColors.antiFlashWhite),
-            child: const Icon(Icons.calendar_month_rounded,
-                color: AppColors.coolGrey, size: 50),
-          ),
+        Row(
+          children: [
+            Container(
+              decoration:
+                  AppStyles.customBoxDecoration(AppColors.antiFlashWhite, 18),
+              child: ElevatedButton(
+                onPressed: () => _pickDate(context, date, onDatePicked),
+                style: AppStyles.customButtonStyle(AppColors.antiFlashWhite),
+                child: const Icon(Icons.calendar_month_rounded,
+                    color: AppColors.coolGrey, size: 50),
+              ),
+            ),
+            const SizedBox(width: 20),
+            Container(
+              decoration:
+                  AppStyles.customBoxDecoration(AppColors.antiFlashWhite, 18),
+              child: ElevatedButton(
+                onPressed: () => _pickTime(context, time, onTimePicked),
+                style: AppStyles.customButtonStyle(AppColors.antiFlashWhite),
+                child: const Icon(Icons.schedule_rounded,
+                    color: AppColors.coolGrey, size: 50),
+              ),
+            ),
+          ],
         ),
-        const SizedBox(width: 20),
-        Container(
-          decoration: customBoxDeoration(AppColors.antiFlashWhite, 18),
-          child: ElevatedButton(
-            onPressed: () => _pickTime(context, time, onTimePicked),
-            style: _buttonStyle(AppColors.antiFlashWhite),
-            child: const Icon(Icons.schedule_rounded,
-                color: AppColors.coolGrey, size: 50),
-          ),
-        ),
-        const SizedBox(width: 20),
         Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildDateTimeText(date?.toIso8601String().substring(0, 10)),
             _buildDateTimeText(time),
@@ -461,45 +459,11 @@ class _AddTaskPageState extends State<AddTaskPage> {
 
   Widget _buildDateTimeText(String? text) {
     return Container(
-      padding: const EdgeInsets.only(bottom: 10),
-      margin: const EdgeInsets.only(bottom: 10),
-      decoration: const BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: AppColors.antiFlashWhite, width: 2),
-        ),
-      ),
+      padding: const EdgeInsets.all(10),
       child: Text(
         text ?? '',
         style: const TextStyle(color: AppColors.antiFlashWhite, fontSize: 16),
       ),
     );
   }
-
-  ButtonStyle _buttonStyle(Color color) {
-    return ElevatedButton.styleFrom(
-      elevation: 10,
-      shadowColor: Colors.black.withOpacity(0.8),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
-      ),
-      padding: const EdgeInsets.all(16),
-      backgroundColor: color,
-    );
-  }
-}
-
-BoxDecoration customBoxDeoration(Color color, double radius) {
-  return BoxDecoration(
-    borderRadius: BorderRadius.circular(radius),
-    color: color,
-    boxShadow: [
-      BoxShadow(
-        blurRadius: 10,
-        blurStyle: BlurStyle.normal,
-        color: Colors.black.withOpacity(0.8),
-        offset: const Offset(0, 5),
-        spreadRadius: 0,
-      )
-    ],
-  );
 }

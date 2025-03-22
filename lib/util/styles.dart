@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:logolda/util/colors.dart';
 
 class AppStyles {
-
   static ButtonStyle customButtonStyle(Color color) {
     return ElevatedButton.styleFrom(
       elevation: 10,
@@ -28,5 +28,30 @@ class AppStyles {
         )
       ],
     );
+  }
+
+  static Color getColorBasedOnStatus(String status) {
+    switch (status) {
+      case 'Esedékes':
+        return AppColors.amethystPurple;
+      case 'Közelgő':
+        return AppColors.goldYellow;
+      case 'Függő':
+        return AppColors.orangePeel;
+      case 'Lejárt':
+        return AppColors.pantoneRed;
+      case 'Könnyű':
+        return AppColors.springBud;
+      case 'Közepes':
+        return AppColors.amethystPurple;
+      case 'Haladó':
+        return AppColors.goldYellow;
+      case 'Nehéz':
+        return AppColors.orangePeel;
+      case 'Mester':
+        return AppColors.pantoneRed;
+      default:
+        return AppColors.coolGrey;
+    }
   }
 }

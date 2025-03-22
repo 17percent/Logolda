@@ -1,9 +1,8 @@
-// HomePage widget that displays the user's tasks in categorized sections
-// and allows the user to navigate to the details page of a task
-
 import 'package:flutter/material.dart';
 import 'package:logolda/screens/profile_page.dart';
 import 'package:logolda/util/colors.dart';
+import 'package:logolda/util/styles.dart';
+import 'package:logolda/util/alerts.dart';
 import 'package:logolda/firebase/auth_handler.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:logolda/models/task.dart';
@@ -21,8 +20,12 @@ class _HomePageState extends State<HomePage> {
   final AuthService _authService = AuthService();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  String? _selectedFilter;
+
   late Future<List<Task>> _userTasks;
-  late Map<String, List<Task>> _categorizedTasks = {};
+  late Map<String, List<Task>> _categorizedTasksByDate = {};
+  late Map<String, List<Task>> _categorizedTasksByCategory = {};
+  late Map<String, List<Task>> _categorizedTasksByDiff = {};
   final Map<String, int> _categorizedTasksAmount = {
     'Esedékes': 0,
     'Közelgő': 0,
@@ -44,14 +47,19 @@ class _HomePageState extends State<HomePage> {
 
     final tasks = await _fetchUserTasks(userId); // Fetch the user's tasks
     setState(() {
-      _categorizedTasks = _categorizeTasksByDate(tasks); // Categorize the tasks
+      _categorizedTasksByDate =
+          _categorizeTasksByDate(tasks); // Categorize the tasks by Date
+      _categorizedTasksByCategory =
+          _categorizeTasksByCategory(tasks); // Categorize the tasks by Category
+      _categorizedTasksByDiff =
+          _categorizeTasksByDiff(tasks); // Categorize the tasks by Difficulty
     });
     _updateCategorizedTasksAmount();
     return tasks;
   }
 
   Future _updateCategorizedTasksAmount() async {
-    for (var entry in _categorizedTasks.entries) {
+    for (var entry in _categorizedTasksByDate.entries) {
       _categorizedTasksAmount[entry.key] = entry.value.length;
     }
   }
@@ -66,7 +74,9 @@ class _HomePageState extends State<HomePage> {
           .map((doc) => Task.fromMap(doc.data(), doc.id))
           .toList();
     } catch (e) {
-      _showSnackBar('Error fetching tasks: $e');
+        if (mounted) {
+          AppAlerts.showSnackBar(context, 'Error fetching tasks: $e');
+        }
       return [];
     }
   }
@@ -111,7 +121,7 @@ class _HomePageState extends State<HomePage> {
           pastTasks.add(task);
         }
       } catch (e) {
-        _showSnackBar(
+        AppAlerts.showSnackBar(context, 
             "Invalid date format for task '${task.title}': $startDateString");
       }
     }
@@ -125,11 +135,36 @@ class _HomePageState extends State<HomePage> {
     };
   }
 
-  void _showSnackBar(String message) {
-    if (mounted) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(message)));
+  Map<String, List<Task>> _categorizeTasksByCategory(List<Task> tasks) {
+    final categorizedTasks = <String, List<Task>>{};
+    for (var task in tasks) {
+      final isDone = task.isDone;
+      final category = task.category;
+      if (category.isEmpty) continue;
+
+      if (categorizedTasks.containsKey(category) && !isDone) {
+        categorizedTasks[category]!.add(task);
+      } else if (!isDone) {
+        categorizedTasks[category] = [task];
+      }
     }
+    return categorizedTasks;
+  }
+
+  Map<String, List<Task>> _categorizeTasksByDiff(List<Task> tasks) {
+    final categorizedTasks = <String, List<Task>>{};
+    for (var task in tasks) {
+      final isDone = task.isDone;
+      final diff = task.difficulty;
+      if (diff.isEmpty) continue;
+
+      if (categorizedTasks.containsKey(diff) && !isDone) {
+        categorizedTasks[diff]!.add(task);
+      } else if (!isDone) {
+        categorizedTasks[diff] = [task];
+      }
+    }
+    return categorizedTasks;
   }
 
   @override
@@ -142,6 +177,46 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           children: [
             const LocalDateDisplay(),
+            Container(
+                margin: const EdgeInsets.fromLTRB(30, 10, 30, 30),
+                child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Szűrés',
+                    style: TextStyle(
+                        color: AppColors.antiFlashWhite, fontSize: 24)),
+                Row(
+                  children: [
+                    _buildActionButtons(
+                      const Icon(Icons.calendar_month_rounded, color: AppColors.antiFlashWhite, size: 36),
+                      () {
+                      setState(() {
+                        _selectedFilter = 'Dátum';
+                      });
+                      },
+                    ),
+                    const SizedBox(width: 10),
+                    _buildActionButtons(
+                      const Icon(Icons.category_rounded, color: AppColors.antiFlashWhite, size: 36),
+                      () {
+                      setState(() {
+                        _selectedFilter = 'Katgeória';
+                      });
+                      },
+                    ),
+                    const SizedBox(width: 10),
+                    _buildActionButtons(
+                      const Icon(Icons.speed_rounded, color: AppColors.antiFlashWhite, size: 36),
+                      () {
+                      setState(() {
+                        _selectedFilter = 'Nehézség';
+                      });
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            )),
             FutureBuilder<List<Task>>(
               future: _userTasks,
               builder: (context, snapshot) {
@@ -157,8 +232,8 @@ class _HomePageState extends State<HomePage> {
                       Container(
                         margin: const EdgeInsets.fromLTRB(20, 10, 20, 20),
                         padding: const EdgeInsets.fromLTRB(32, 16, 32, 16),
-                        decoration:
-                            customBoxDeoration(AppColors.antiFlashWhite, 18),
+                        decoration: AppStyles.customBoxDecoration(
+                            AppColors.antiFlashWhite, 18),
                         child: const Text('Indulhat a logolás!',
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
@@ -198,8 +273,12 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ],
                   );
+                } else if (_selectedFilter == 'Katgeória') {
+                  return _buildTaskCategories(_categorizedTasksByCategory);
+                } else if (_selectedFilter == 'Nehézség') {
+                  return _buildTaskCategories(_categorizedTasksByDiff);
                 } else {
-                  return _buildTaskCategories();
+                  return _buildTaskCategories(_categorizedTasksByDate);
                 }
               },
             ),
@@ -293,11 +372,11 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildTaskCategories() {
+  Widget _buildTaskCategories(Map<String, List<Task>> categorizedTasks) {
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: _categorizedTasks.entries
+        children: categorizedTasks.entries
             .where((entry) => entry.key != 'Kész')
             .map((entry) {
           return TaskCategorySection(title: entry.key, tasks: entry.value);
@@ -311,31 +390,15 @@ Widget _buildActionButtons(Icon icon, Function onPressed) {
   return Column(
     children: [
       Container(
-        margin: const EdgeInsets.symmetric(horizontal: 20),
-        decoration: customBoxDeoration(AppColors.coolGrey, 18),
+        decoration: AppStyles.customBoxDecoration(AppColors.coolGrey, 18),
         child: IconButton(
           icon: icon,
           onPressed: onPressed as void Function()?,
-          style: _buttonStyle(AppColors.coolGrey),
+          style: AppStyles.customButtonStyle(AppColors.coolGrey),
         ),
       ),
     ],
   );
-}
-
-Color getColorBasedOnStatus(String status) {
-  switch (status) {
-    case 'Esedékes':
-      return AppColors.amethystPurple;
-    case 'Közelgő':
-      return AppColors.goldYellow;
-    case 'Függő':
-      return AppColors.orangePeel;
-    case 'Lejárt':
-      return AppColors.pantoneRed;
-    default:
-      return AppColors.antiFlashWhite;
-  }
 }
 
 class TaskCategorySection extends StatefulWidget {
@@ -365,7 +428,8 @@ class _TaskCategorySectionState extends State<TaskCategorySection> {
       padding: const EdgeInsets.symmetric(horizontal: 24.0),
       child: Container(
         margin: const EdgeInsets.only(bottom: 25),
-        decoration: customBoxDeoration(getColorBasedOnStatus(widget.title), 18),
+        decoration: AppStyles.customBoxDecoration(
+            AppStyles.getColorBasedOnStatus(widget.title), 18),
         child: Card(
           elevation: 4,
           shape:
@@ -390,7 +454,8 @@ class _TaskCategorySectionState extends State<TaskCategorySection> {
               return Container(
                 margin: const EdgeInsets.all(12),
                 // padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                decoration: customBoxDeoration(AppColors.coolGrey, 18),
+                decoration:
+                    AppStyles.customBoxDecoration(AppColors.coolGrey, 18),
                 child: ListTile(
                   title: Text(task.title,
                       style: const TextStyle(color: AppColors.antiFlashWhite)),
@@ -443,32 +508,4 @@ class LocalDateDisplay extends StatelessWidget {
       ),
     );
   }
-}
-
-BoxDecoration customBoxDeoration(Color color, double radius) {
-  return BoxDecoration(
-    borderRadius: BorderRadius.circular(radius),
-    color: color,
-    boxShadow: [
-      BoxShadow(
-        blurRadius: 10,
-        blurStyle: BlurStyle.normal,
-        color: Colors.black.withOpacity(0.5),
-        offset: const Offset(0, 5),
-        spreadRadius: 0,
-      )
-    ],
-  );
-}
-
-ButtonStyle _buttonStyle(Color color) {
-  return ElevatedButton.styleFrom(
-    elevation: 10,
-    shadowColor: Colors.black.withOpacity(0.8),
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(18),
-    ),
-    padding: const EdgeInsets.all(16),
-    backgroundColor: color,
-  );
 }
