@@ -200,7 +200,7 @@ class _HomePageState extends State<HomePage> {
                       const Icon(Icons.category_rounded, color: AppColors.antiFlashWhite, size: 36),
                       () {
                       setState(() {
-                        _selectedFilter = 'Katgeória';
+                        _selectedFilter = 'Kategória';
                       });
                       },
                     ),
@@ -273,11 +273,11 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ],
                   );
-                } else if (_selectedFilter == 'Katgeória') {
+                } else if (_selectedFilter == 'Kategória') {
                   return _buildTaskCategories(_categorizedTasksByCategory);
                 } else if (_selectedFilter == 'Nehézség') {
                   return _buildTaskCategories(_categorizedTasksByDiff);
-                } else {
+                } else { // Default behaviour
                   return _buildTaskCategories(_categorizedTasksByDate);
                 }
               },
@@ -467,7 +467,7 @@ class _TaskCategorySectionState extends State<TaskCategorySection> {
                         context,
                         MaterialPageRoute(
                             builder: (context) => TaskDetailsPage(
-                                task: task, title: widget.title)),
+                                task: task, title: widget.title, page: '/home')),
                       );
                     },
                   ),

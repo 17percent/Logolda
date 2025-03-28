@@ -10,10 +10,11 @@ import 'package:logolda/services/noti_service.dart';
 import 'package:logolda/services/textAnalytics_service.dart';
 
 class TaskDetailsPage extends StatefulWidget {
-  const TaskDetailsPage({super.key, required this.task, required this.title});
+  const TaskDetailsPage({super.key, required this.task, required this.title, required this.page});
 
   final Task task;
   final String title;
+  final String page;
 
   @override
   State<TaskDetailsPage> createState() => _TaskDetailsPageState();
@@ -27,6 +28,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
   Map<String, int> _difficultiesAndScores = {};
   late Task _task;
   late String _title;
+  late String _page;
 
   @override
   void initState() {
@@ -34,6 +36,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
     fetchDifficultiesAndScores();
     _task = widget.task;
     _title = widget.title;
+    _page = widget.page;
   }
 
   @override
@@ -250,7 +253,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
       await _notiService.cancelNotification(widget.task.notificationId);
       if (mounted) {
         Navigator.pushNamedAndRemoveUntil(
-            context, '/home', (Route<dynamic> route) => false);
+            context, _page, (Route<dynamic> route) => false);
       }
       _showSnackBar("Sikeres archiválás!");
     } catch (e) {
@@ -303,7 +306,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
       await _firestore.collection('Tasks').doc(id).delete();
       if (mounted) {
         Navigator.pushNamedAndRemoveUntil(
-            context, '/home', (Route<dynamic> route) => false);
+            context, _page, (Route<dynamic> route) => false);
       }
       _showSnackBar("Sikeres törlés!");
     } catch (e) {

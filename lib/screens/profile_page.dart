@@ -81,10 +81,14 @@ class _ProfilePageState extends State<ProfilePage> {
                           const Icon(Icons.account_circle,
                               color: AppColors.antiFlashWhite, size: 140),
                           const SizedBox(height: 10),
-                          Text(
-                            '${userData['name']}',
-                            style: const TextStyle(
-                                fontSize: 24, color: AppColors.antiFlashWhite),
+                          SizedBox(
+                            width: 190,
+                            child: Text(
+                              '${userData['name']}',
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                  fontSize: 20, color: AppColors.antiFlashWhite),
+                            ),
                           ),
                         ]),
                         const SizedBox(width: 50),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:logolda/util/colors.dart';
+import 'package:logolda/util/styles.dart';
+import 'package:logolda/util/alerts.dart';
 import 'package:logolda/firebase/auth_handler.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:logolda/models/task.dart';
@@ -191,14 +193,14 @@ class _TaskCategorySectionState extends State<TaskCategorySection> {
     if (widget.tasks.isEmpty) return const SizedBox.shrink();
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+      padding: const EdgeInsets.fromLTRB(24, 0, 24, 0),
       child: Container(
         margin: const EdgeInsets.only(bottom: 25),
-        decoration: customBoxDeoration(AppColors.springBud),
+        decoration: AppStyles.customBoxDecoration(AppColors.springBud, 18),
         child: Card(
           elevation: 4,
           shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
           child: ExpansionTile(
             title: Text(
               widget.title,
@@ -207,6 +209,7 @@ class _TaskCategorySectionState extends State<TaskCategorySection> {
                   fontSize: 18,
                   fontWeight: FontWeight.bold),
             ),
+            tilePadding: const EdgeInsets.fromLTRB(14, 0, 12, 6),
             showTrailingIcon: false,
             initiallyExpanded: true,
             enabled: false,
@@ -220,27 +223,11 @@ class _TaskCategorySectionState extends State<TaskCategorySection> {
   }
 }
 
-BoxDecoration customBoxDeoration(Color color) {
-  return BoxDecoration(
-    borderRadius: BorderRadius.circular(8),
-    color: color,
-    boxShadow: [
-      BoxShadow(
-        blurRadius: 10,
-        blurStyle: BlurStyle.normal,
-        color: Colors.black.withOpacity(0.5),
-        offset: const Offset(0, 5),
-        spreadRadius: 0,
-      )
-    ],
-  );
-}
-
 Container customContainerForArchivedTasks(Task task, BuildContext context) {
   return Container(
-    margin: const EdgeInsets.all(12),
-    // padding: const EdgeInsets.symmetric(horizontal: 24.0),
-    decoration: customBoxDeoration(AppColors.coolGrey),
+    margin: const EdgeInsets.fromLTRB(12, 0, 12, 24),
+    // padding: const EdgeInsets.only(bottom: 10),
+    decoration: AppStyles.customBoxDecoration(AppColors.coolGrey, 18),
     child: ListTile(
       title: Text(task.title,
           style: const TextStyle(color: AppColors.antiFlashWhite)),
@@ -254,6 +241,7 @@ Container customContainerForArchivedTasks(Task task, BuildContext context) {
                 builder: (context) => TaskDetailsPage(
                       task: task,
                       title: "Kész",
+                      page: '/archive'
                     )),
           );
         },

@@ -73,58 +73,73 @@ class _IntroPageState extends State<IntroPage> {
       pages: [
         // Page One
         PageViewModel(
-          titleWidget: Container(
-            alignment: Alignment.center,
-            margin: const EdgeInsets.fromLTRB(20, 30, 20, 10),
-            child: const Column(
-              children: [
-                Text(
-                  'Kategóriák',
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.antiFlashWhite,
-                  ),
-                ),
-                SizedBox(height: 10),
-                Divider(
-                  color: AppColors.antiFlashWhite,
-                  thickness: 2
-                ),
-                SizedBox(height: 10),
-                Text(
-                  'Első lépésben hozz létre új kategóriákat, amelyek segítenek majd rendszerezni a feladataidat! ',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: AppColors.antiFlashWhite,
-                  ),
-                ),
-              ],
+          titleWidget: _buildCustomTitleWidget(
+              'Kategóriák',
+              'Első lépésben hozz létre új kategóriákat, amelyek segítenek majd rendszerezni a feladataidat!',
             ),
-          ),
-          bodyWidget: Container(
-            alignment: Alignment.center,
-            margin: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-            child: Column(
-              children: [
-                Image.asset('assets/tutorial_page1.png', fit: BoxFit.fitWidth),
-                const SizedBox(height: 30),
-                const Text('Ezt követően tudsz majd a feladataidhoz kategóriát hozzárendelni!',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: AppColors.antiFlashWhite,
-                    ),
-                    textAlign: TextAlign.center,
-                    ),
-              ],
-            ),
+          bodyWidget: _buildCustomBodyWidget(
+            'Ezt követően tudsz majd a feladataidhoz kategóriát hozzárendelni!',
+            'assets/tutorial_page1.png',
           ),
         ),
         PageViewModel(
-          title: 'Page Two',
-          bodyWidget: const Text('That\'s all folks'),
+          titleWidget: _buildCustomTitleWidget('Események',
+              'Az Új esemény menüpontban tudsz új eseményeket létrehozni, ahol beállíthatod az események paramétereit!'),
+          bodyWidget: _buildCustomBodyWidget(
+              'A leírás megadásakor törekedj részletes emlékeztető megadására, hogy később ne felejtsd el, miért hoztad létre az eseményt!',
+              'assets/tutorial_page2.png'),
         ),
       ],
+    );
+  }
+
+  Container _buildCustomTitleWidget(String title, String desc) {
+    return Container(
+      alignment: Alignment.center,
+      margin: const EdgeInsets.fromLTRB(20, 30, 20, 10),
+      child: Column(
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+              color: AppColors.antiFlashWhite,
+            ),
+          ),
+          const SizedBox(height: 10),
+          const Divider(color: AppColors.antiFlashWhite, thickness: 2),
+          const SizedBox(height: 10),
+          Text(
+            desc,
+            style: const TextStyle(
+              fontSize: 16,
+              color: AppColors.antiFlashWhite,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Container _buildCustomBodyWidget(String desc, String imagePath) {
+    return Container(
+      alignment: Alignment.center,
+      margin: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+      child: Column(
+        children: [
+          Image.asset(imagePath, fit: BoxFit.fitWidth),
+          const SizedBox(height: 30),
+          Text(
+            desc,
+            style: const TextStyle(
+              fontSize: 16,
+              color: AppColors.antiFlashWhite,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:logolda/util/colors.dart';
+import 'package:logolda/util/styles.dart';
 import 'package:logolda/firebase/auth_handler.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -24,7 +25,7 @@ class _StandingsPageState extends State<StandingsPage> {
     user = _authService.getLoggedInUser();
     _fetchUsers();
   }
-  
+
   Future _fetchUsers() async {
     try {
       QuerySnapshot snapshot = await _firestore.collection('Users').get();
@@ -115,13 +116,76 @@ class _StandingsPageState extends State<StandingsPage> {
     );
   }
 
+  Widget _buildUserStanding() {
+    final keyUser = user?.uid;
+    if (keyUser == null || !_standings.containsKey(keyUser)) {
+      return const CircularProgressIndicator();
+    } else {
+      _sortMappedUsers();
+      final userStanding = _standings[keyUser];
+      if (userStanding == null) {
+        return const CircularProgressIndicator();
+      }
+      return Container(
+        margin: const EdgeInsets.fromLTRB(24, 10, 24, 10),
+        alignment: Alignment.center,
+        padding: const EdgeInsets.fromLTRB(8, 16, 8, 16),
+        decoration: AppStyles.customBoxDecoration(AppColors.coolGrey, 18),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Expanded(
+                  child: Text(
+                    (_standings.keys.toList().indexOf(keyUser) + 1).toString(),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.antiFlashWhite,
+                        fontSize: 16),
+                  ),
+                ),
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        userStanding['seed'].floor().toString(),
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                            color: AppColors.antiFlashWhite, fontSize: 16),
+                      ),
+                      const SizedBox(width: 5),
+                      const Icon(Icons.spa_rounded,
+                          color: AppColors.antiFlashWhite, size: 20),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Text(
+                    userStanding['username'],
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        color: AppColors.antiFlashWhite, fontSize: 16),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
   Widget _buildStandings() {
     if (_standings.isEmpty) {
       return Container(
         margin: const EdgeInsets.fromLTRB(10, 10, 10, 10),
         alignment: Alignment.center,
         padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
-        decoration: customBoxDeoration(AppColors.antiFlashWhite, 18),
+        decoration: AppStyles.customBoxDecoration(AppColors.antiFlashWhite, 18),
         child: const Text(
           'Nincs megjeleníthető adat.',
           style: TextStyle(color: AppColors.spaceCadet, fontSize: 16),
@@ -129,52 +193,79 @@ class _StandingsPageState extends State<StandingsPage> {
       );
     } else {
       _sortMappedUsers();
-    return Column(
-      children: _standings.entries.map((entry) {
-      int index = _standings.keys.toList().indexOf(entry.key);
-      BoxDecoration decoration;
-      if (index == 0) {
-        decoration = customBoxDeoration(AppColors.goldYellow, 18);
-      } else if (index == 1) {
-        decoration = customBoxDeoration(AppColors.silverGrey, 18);
-      } else if (index == 2) {
-        decoration = customBoxDeoration(AppColors.bronzeBrown, 18);
-      } else {
-        decoration = customBoxDeoration(AppColors.antiFlashWhite, 18);
-      }
-      return Container(
-        margin: const EdgeInsets.fromLTRB(12, 10, 12, 10),
-        padding: const EdgeInsets.fromLTRB(10, 16, 10, 16),
-        decoration: decoration,
-        child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-          child: Text(
-            (index + 1).toString(),
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.spaceCadet, fontSize: 16),
-          ),
-          ),
-          Expanded(
-          child: Text(
-            entry.value['seed'].floor().toString(),
-            textAlign: TextAlign.center,
-            style: const TextStyle(color: AppColors.spaceCadet, fontSize: 16),
-          ),
-          ),
-          Expanded(
-          child: Text(
-            entry.value['username'],
-            textAlign: TextAlign.center,
-            style: const TextStyle(color: AppColors.spaceCadet, fontSize: 16),
-          ),
-          ),
-        ],
-        ),
+      return Column(
+        children: _standings.entries.map((entry) {
+          int index = _standings.keys.toList().indexOf(entry.key);
+          Color decorationColor;
+
+          switch (index) {
+            case 0:
+              decorationColor = AppColors.goldYellow;
+              break;
+            case 1:
+              decorationColor = AppColors.silverGrey;
+              break;
+            case 2:
+              decorationColor = AppColors.bronzeBrown;
+              break;
+            default:
+              decorationColor = AppColors.antiFlashWhite;
+          }
+
+          BoxDecoration decoration =
+              AppStyles.customBoxDecoration(decorationColor, 18);
+          if (entry.key == user!.uid) {
+            decoration = decoration.copyWith(
+              border: Border.all(color: AppColors.pantoneRed, width: 3),
+            );
+          }
+          return Container(
+            margin: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+            padding: const EdgeInsets.fromLTRB(10, 16, 10, 16),
+            decoration: decoration,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Expanded(
+                  child: Text(
+                    (index + 1).toString(),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.spaceCadet,
+                        fontSize: 16),
+                  ),
+                ),
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        entry.value['seed'].floor().toString(),
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                            color: AppColors.spaceCadet, fontSize: 16),
+                      ),
+                      const SizedBox(width: 5),
+                      const Icon(Icons.spa_rounded,
+                          color: AppColors.coolGrey, size: 20),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Text(
+                    entry.value['username'],
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        color: AppColors.spaceCadet, fontSize: 16),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }).toList(),
       );
-      }).toList(),
-    );
     }
   }
 
@@ -184,71 +275,77 @@ class _StandingsPageState extends State<StandingsPage> {
       backgroundColor: AppColors.spaceCadet,
       appBar: _buildAppBar(),
       drawer: _buildDrawer(),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Container(
+      body: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            alignment: Alignment.center,
+            child: Stack(
               alignment: Alignment.center,
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  Icon(Icons.public_rounded,
-                      size: 100,
-                      color: AppColors.antiFlashWhite.withOpacity(0.2)),
-                  const Text('Eredménytábla',
-                      style: TextStyle(
-                          fontSize: 28, color: AppColors.antiFlashWhite)),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Text('Helyezés',
+                Icon(Icons.public_rounded,
+                    size: 100,
+                    color: AppColors.antiFlashWhite.withOpacity(0.2)),
+                const Text('Eredménytábla',
                     style: TextStyle(
-                        color: AppColors.antiFlashWhite, fontSize: 16)),
-                SizedBox(width: 10),
-                Text('Seed',
-                    style: TextStyle(
-                        color: AppColors.antiFlashWhite, fontSize: 16)),
-                SizedBox(width: 10),
-                Text('Felhasználó',
-                    style: TextStyle(
-                        color: AppColors.antiFlashWhite, fontSize: 16)),
+                        fontSize: 28, color: AppColors.antiFlashWhite)),
               ],
             ),
-            _buildStandings(),
-          ],
-        ),
+          ),
+          const SizedBox(height: 20),
+          const Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Column(
+                children: [
+                  Icon(Icons.leaderboard_rounded,
+                      color: AppColors.antiFlashWhite, size: 30),
+                  SizedBox(height: 5),
+                  Text('Helyezés',
+                      style: TextStyle(
+                          color: AppColors.antiFlashWhite, fontSize: 16)),
+                ],
+              ),
+              Column(
+                children: [
+                  Icon(Icons.spa_rounded,
+                      color: AppColors.antiFlashWhite, size: 30),
+                  SizedBox(height: 5),
+                  Text('Seed',
+                      style: TextStyle(
+                          color: AppColors.antiFlashWhite, fontSize: 16)),
+                ],
+              ),
+              Column(
+                children: [
+                  Icon(Icons.account_circle_rounded,
+                      color: AppColors.antiFlashWhite, size: 30),
+                  SizedBox(height: 5),
+                  Text('Felhasználó',
+                      style: TextStyle(
+                          color: AppColors.antiFlashWhite, fontSize: 16)),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          _buildUserStanding(),
+          const SizedBox(height: 10),
+          const Divider(
+            color: AppColors.antiFlashWhite,
+            indent: 30,
+            endIndent: 30,
+            thickness: 2,
+          ),
+          const SizedBox(height: 10),
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 24),
+              child: _buildStandings(),
+            ),
+          ),
+        ],
       ),
     );
   }
-
-  void _showSnackBar(String message) {
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)),
-      );
-    }
-  }
 }
-
-BoxDecoration customBoxDeoration(Color color, double radius) {
-  return BoxDecoration(
-    borderRadius: BorderRadius.circular(radius),
-    color: color,
-    boxShadow: [
-      BoxShadow(
-        blurRadius: 10,
-        blurStyle: BlurStyle.normal,
-        color: Colors.black.withOpacity(0.5),
-        offset: const Offset(0, 5),
-        spreadRadius: 0,
-      )
-    ],
-  );
-}
-
-

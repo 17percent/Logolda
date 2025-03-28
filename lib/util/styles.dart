@@ -32,6 +32,8 @@ class AppStyles {
 
   static Color getColorBasedOnStatus(String status) {
     switch (status) {
+      case 'Kész':
+        return AppColors.springBud;
       case 'Esedékes':
         return AppColors.amethystPurple;
       case 'Közelgő':
