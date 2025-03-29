@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:logolda/util/colors.dart';
 import 'package:logolda/util/styles.dart';
-import 'package:logolda/util/alerts.dart';
 import 'package:logolda/firebase/auth_handler.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:logolda/models/task.dart';

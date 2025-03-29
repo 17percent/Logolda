@@ -75,77 +75,76 @@ class _ProfilePageState extends State<ProfilePage> {
                 child: Column(
                   children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Column(children: [
-                          const Icon(Icons.account_circle,
-                              color: AppColors.antiFlashWhite, size: 140),
-                          const SizedBox(height: 10),
-                          SizedBox(
-                            width: 190,
-                            child: Text(
-                              '${userData['name']}',
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                  fontSize: 20, color: AppColors.antiFlashWhite),
-                            ),
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Column(
+                            children: [
+                              const Icon(Icons.account_circle,
+                                  color: AppColors.antiFlashWhite, size: 125),
+                              const SizedBox(height: 10),
+                              Text(
+                                '${userData['name']}',
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                    fontSize: 18,
+                                    color: AppColors.antiFlashWhite),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                          Column(
+                            children: [
+                              const Text(
+                                'Rank',
+                                style: TextStyle(
+                                    color: AppColors.antiFlashWhite,
+                                    fontSize: 20),
+                              ),
+                              const SizedBox(height: 10),
+                              Container(
+                                alignment: Alignment.center,
+                                padding: const EdgeInsets.fromLTRB(24, 8, 24, 8),
+                                decoration: customBoxDeoration(
+                                    AppColors.antiFlashWhite, 18),
+                                child: Text(
+                                  '${userData['rank']}',
+                                  style: const TextStyle(
+                                      color: AppColors.spaceCadet,
+                                      fontSize: 20),
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              const Text(
+                                'Seeds',
+                                style: TextStyle(
+                                    color: AppColors.antiFlashWhite,
+                                    fontSize: 20),
+                              ),
+                              const SizedBox(height: 10),
+                              Container(
+                                alignment: Alignment.center,
+                                padding:
+                                    const EdgeInsets.fromLTRB(24, 8, 24, 8),
+                                decoration: customBoxDeoration(
+                                    AppColors.antiFlashWhite, 18),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(Icons.spa_rounded,
+                                        color: AppColors.coolGrey),
+                                    const SizedBox(width: 5),
+                                    Text(
+                                      '${userData['seeds'].floor()}',
+                                      style: const TextStyle(
+                                          color: AppColors.spaceCadet,
+                                          fontSize: 20),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                         ]),
-                        const SizedBox(width: 50),
-                        Column(
-                          children: [
-                            const Text(
-                              'Rank',
-                              style: TextStyle(
-                                  color: AppColors.antiFlashWhite,
-                                  fontSize: 20),
-                            ),
-                            const SizedBox(height: 10),
-                            Container(
-                              alignment: Alignment.center,
-                              width: 150,
-                              padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
-                              decoration: customBoxDeoration(
-                                  AppColors.antiFlashWhite, 18),
-                              child: Text(
-                                '${userData['rank']}',
-                                style: const TextStyle(
-                                    color: AppColors.spaceCadet, fontSize: 20),
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                            const Text(
-                              'Seeds',
-                              style: TextStyle(
-                                  color: AppColors.antiFlashWhite,
-                                  fontSize: 20),
-                            ),
-                            const SizedBox(height: 10),
-                            Container(
-                              width: 150,
-                              alignment: Alignment.center,
-                              padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
-                              decoration: customBoxDeoration(
-                                  AppColors.antiFlashWhite, 18),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Icon(Icons.spa_rounded,
-                                      color: AppColors.coolGrey),
-                                  const SizedBox(width: 5),
-                                  Text(
-                                    '${userData['seeds'].floor()}',
-                                    style: const TextStyle(
-                                        color: AppColors.spaceCadet,
-                                        fontSize: 20),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        )
-                      ],
-                    ),
                     const SizedBox(height: 30),
                     const Divider(
                       color: AppColors.antiFlashWhite,

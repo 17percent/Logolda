@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:logolda/util/colors.dart';
-import 'package:logolda/util/styles.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 
 class IntroPage extends StatefulWidget {
@@ -17,49 +16,39 @@ class _IntroPageState extends State<IntroPage> {
   Widget build(BuildContext context) {
     return IntroductionScreen(
       key: _introKey,
-      baseBtnStyle: AppStyles.customButtonStyle(AppColors.antiFlashWhite),
       globalBackgroundColor: AppColors.spaceCadet,
       // custom Back Button
       showBackButton: true,
-      overrideBack: Container(
-        decoration: AppStyles.customBoxDecoration(AppColors.coolGrey, 18),
-        child: IconButton(
-          onPressed: () {
-            setState(() {
-              _introKey.currentState?.previous();
-            });
-          },
-          icon: const Icon(Icons.arrow_circle_left_outlined, size: 50),
-          color: AppColors.antiFlashWhite,
-        ),
+      overrideBack: IconButton(
+        onPressed: () {
+          setState(() {
+            _introKey.currentState?.previous();
+          });
+        },
+        icon: const Icon(Icons.arrow_circle_left_outlined, size: 50),
+        color: AppColors.antiFlashWhite,
       ),
       // custom Next Button
       showNextButton: true,
-      overrideNext: Container(
-        decoration: AppStyles.customBoxDecoration(AppColors.coolGrey, 18),
-        child: IconButton(
-          onPressed: () {
-            setState(() {
-              _introKey.currentState?.next();
-            });
-          },
-          icon: const Icon(Icons.arrow_circle_right_outlined, size: 50),
-          color: AppColors.antiFlashWhite,
-        ),
+      overrideNext: IconButton(
+        onPressed: () {
+          setState(() {
+            _introKey.currentState?.next();
+          });
+        },
+        icon: const Icon(Icons.arrow_circle_right_outlined, size: 50),
+        color: AppColors.antiFlashWhite,
       ),
       // custom Done Button
       showDoneButton: true,
-      overrideDone: Container(
-        decoration: AppStyles.customBoxDecoration(AppColors.coolGrey, 18),
-        child: IconButton(
-          onPressed: () {
-            setState(() {
-              Navigator.pushReplacementNamed(context, '/home');
-            });
-          },
-          icon: const Icon(Icons.check_rounded, size: 50),
-          color: AppColors.antiFlashWhite,
-        ),
+      overrideDone: IconButton(
+        onPressed: () {
+          setState(() {
+            Navigator.pushReplacementNamed(context, '/home');
+          });
+        },
+        icon: const Icon(Icons.check_rounded, size: 50),
+        color: AppColors.antiFlashWhite,
       ),
       dotsDecorator: DotsDecorator(
         activeColor: AppColors.antiFlashWhite,
@@ -69,9 +58,9 @@ class _IntroPageState extends State<IntroPage> {
           borderRadius: BorderRadius.circular(25),
         ),
       ),
-      controlsPadding: const EdgeInsets.fromLTRB(30, 10, 30, 30),
+      controlsPadding: const EdgeInsets.fromLTRB(0, 10, 0, 30),
       pages: [
-        // Page One
+        // Kategóriák
         PageViewModel(
           titleWidget: _buildCustomTitleWidget(
               'Kategóriák',
@@ -82,12 +71,45 @@ class _IntroPageState extends State<IntroPage> {
             'assets/tutorial_page1.png',
           ),
         ),
+        // Események
         PageViewModel(
           titleWidget: _buildCustomTitleWidget('Események',
-              'Az Új esemény menüpontban tudsz új eseményeket létrehozni, ahol beállíthatod az események paramétereit!'),
+              'Az <Új esemény> menüpontban tudsz új eseményeket létrehozni, ahol beállíthatod az események paramétereit!'),
           bodyWidget: _buildCustomBodyWidget(
-              'A leírás megadásakor törekedj részletes emlékeztető megadására, hogy később ne felejtsd el, miért hoztad létre az eseményt!',
+              'A leírás megfogalmazásakor törekedj részletes emlékeztető megadására, hogy később ne felejtsd el, miért hoztad létre az eseményt!',
               'assets/tutorial_page2.png'),
+        ),
+        // Részletek      
+        PageViewModel(
+          titleWidget: _buildCustomTitleWidget('Részletek',
+              'Az események részleteit a főoldalon található lenyitható dobozok segítségével tudod elérni!'),
+          bodyWidget: _buildCustomBodyWidget(
+              'Itt lehetőséged van az esemény módosítására, törlésére, valamint ha elkészültél az eseményben meghatározott feladatokkal, akkor a zöld gomb segítségével archiválhatod az eseményt!',
+              'assets/tutorial_page3.png'),
+        ),
+        // Archívum      
+        PageViewModel(
+          titleWidget: _buildCustomTitleWidget('Archívum',
+              'Az archivált eseményeket az <Archívum> menüponton éred el! Minden archivált eseményért értékes pontokat gyűjthetsz!'),
+          bodyWidget: _buildCustomBodyWidget(
+              'Az archivált események részletei is megtekinthetők a már korábban ismertetett módon, azonban ezeket az eseményeket már csak törölni tudod az archívumból.',
+              'assets/tutorial_page4.png'),
+        ),
+        // Profil      
+        PageViewModel(
+          titleWidget: _buildCustomTitleWidget('Profil',
+              'A profil oldalon megtekintheted a fiókod adatait! Itt jelenik meg a rankod és az eddig összegyűjtött pontjaid száma!'),
+          bodyWidget: _buildCustomBodyWidget(
+              'Továbbá, nyomon követheted a létrehozott eseményeid számát az idő távlatában!',
+              'assets/tutorial_page6.png'),
+        ),
+        // Eredménytábla      
+        PageViewModel(
+          titleWidget: _buildCustomTitleWidget('Eredménytábla',
+              'Az eredménytábla megmutatja, hogy a jelenlegi pontjaid alapján hol helyezkedsz el a globális rangsorban!'),
+          bodyWidget: _buildCustomBodyWidget(
+              'Továbbá, a globális rangsor segítségével megtekintheted a többi felhasználó által elért helyezéseket!',
+              'assets/tutorial_page5.png'),
         ),
       ],
     );
@@ -116,6 +138,7 @@ class _IntroPageState extends State<IntroPage> {
               fontSize: 16,
               color: AppColors.antiFlashWhite,
             ),
+            textAlign: TextAlign.center
           ),
         ],
       ),
