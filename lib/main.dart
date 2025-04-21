@@ -47,7 +47,7 @@ class MyApp extends StatelessWidget {
         fontFamily: 'Michroma',
         useMaterial3: true
       ),
-      initialRoute: '/', // Set the initial route to the login page
+      initialRoute: '/', 
       routes: {
         '/': (context) => const LoginPage(),
         '/home': (context) => const HomePage(),

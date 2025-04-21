@@ -76,7 +76,12 @@ class _ModifyPageState extends State<ModifyPage> {
         return;
       }
 
-      if (_startDate!.isAfter(_dueDate!)) {
+      if (_startDate!.isAfter(_dueDate!) || 
+          (_startDate!.day == _dueDate!.day &&
+              60 * int.parse(_startTime!.substring(0, 2)) +
+              int.parse(_startTime!.substring(3, 5)) >
+              60 * int.parse(_dueTime!.substring(0, 2)) +
+              int.parse(_dueTime!.substring(3, 5)))) {
         AppAlerts.showSnackBar(
             context, "Az esemény nem kezdőthet később a határidőnél!");
         return;

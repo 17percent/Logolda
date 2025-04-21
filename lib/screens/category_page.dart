@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:logolda/util/colors.dart';
+import 'package:logolda/util/styles.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -112,7 +113,7 @@ class _CategoryPageState extends State<CategoryPage> {
           return Container(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             margin: const EdgeInsets.symmetric(vertical: 12),
-            decoration: customBoxDeoration(AppColors.coolGrey, 18),
+            decoration: AppStyles.customBoxDecoration(AppColors.coolGrey, 18),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -142,7 +143,7 @@ class _CategoryPageState extends State<CategoryPage> {
                                   child: Container(
                               padding: const EdgeInsets.all(10),
                               decoration:
-                                  customBoxDeoration(AppColors.coolGrey, 18),
+                                  AppStyles.customBoxDecoration(AppColors.coolGrey, 18),
                               child: const Icon(
                                   Icons.arrow_circle_left_outlined,
                                   color: AppColors.antiFlashWhite,
@@ -155,7 +156,7 @@ class _CategoryPageState extends State<CategoryPage> {
                                   child: Container(
                               padding: const EdgeInsets.all(10),
                               decoration:
-                                  customBoxDeoration(AppColors.pantoneRed, 18),
+                                  AppStyles.customBoxDecoration(AppColors.pantoneRed, 18),
                               child: const Icon(
                                   Icons.delete_forever_rounded,
                                   color: AppColors.antiFlashWhite,
@@ -192,7 +193,7 @@ class _CategoryPageState extends State<CategoryPage> {
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 48.0),
         child: Column(
           children: [
             Container(
@@ -220,10 +221,10 @@ class _CategoryPageState extends State<CategoryPage> {
                 const SizedBox(height: 30),
                 Center(
                   child: Container(
-                    decoration: customBoxDeoration(AppColors.coolGrey, 18),
+                    decoration: AppStyles.customBoxDecoration(AppColors.coolGrey, 18),
                     child: ElevatedButton(
                       onPressed: _saveCategory,
-                      style: _buttonStyle(AppColors.springBud),
+                      style: AppStyles.customButtonStyle(AppColors.springBud),
                       child: const Icon(Icons.save_rounded,
                           color: AppColors.spaceCadet, size: 50),
                     ),
@@ -281,31 +282,3 @@ class _CategoryPageState extends State<CategoryPage> {
     );
   }
 }
-
-BoxDecoration customBoxDeoration(Color color, double radius) {
-  return BoxDecoration(
-    borderRadius: BorderRadius.circular(radius),
-    color: color,
-    boxShadow: [
-      BoxShadow(
-        blurRadius: 10,
-        blurStyle: BlurStyle.normal,
-        color: Colors.black.withOpacity(0.5),
-        offset: const Offset(0, 5),
-        spreadRadius: 0,
-      )
-    ],
-  );
-}
-
-ButtonStyle _buttonStyle(Color color) {
-    return ElevatedButton.styleFrom(
-      elevation: 10,
-      shadowColor: Colors.black.withOpacity(0.8),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
-      ),
-      padding: const EdgeInsets.all(16),
-      backgroundColor: color,
-    );
-  }

@@ -28,9 +28,9 @@ class _AddTaskPageState extends State<AddTaskPage> {
   bool _isLoadingCategories = true;
   bool _isLoadingDifficulties = true;
   DateTime? _startDate = DateTime.now();
-  String? _startTime = _formatTimeOfDay(TimeOfDay.now());
+  TimeOfDay? _startTime = TimeOfDay.now();
   DateTime? _dueDate = DateTime.now();
-  String? _dueTime = _formatTimeOfDay(TimeOfDay.now());
+  TimeOfDay? _dueTime = TimeOfDay.now();
 
   static String _formatTimeOfDay(TimeOfDay time) =>
       "${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}";
@@ -55,14 +55,14 @@ class _AddTaskPageState extends State<AddTaskPage> {
     }
   }
 
-  Future<void> _pickTime(BuildContext context, String? initialTime,
-      ValueChanged<String> onTimePicked) async {
+  Future<void> _pickTime(BuildContext context, TimeOfDay? initialTime,
+      ValueChanged<TimeOfDay> onTimePicked) async {
     final pickedTime = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
     );
     if (pickedTime != null) {
-      onTimePicked(_formatTimeOfDay(pickedTime));
+      onTimePicked(pickedTime);
     }
   }
 
@@ -113,6 +113,9 @@ class _AddTaskPageState extends State<AddTaskPage> {
     final taskLocation = _locationController.text.trim();
     final taskStartDate = _startDate?.toIso8601String().substring(0, 10);
     final taskDueDate = _dueDate?.toIso8601String().substring(0, 10);
+    final taskStartTime = _formatTimeOfDay(_startTime!);
+    final taskDueTime = _formatTimeOfDay(_dueTime!);
+
 
     if (taskTitle.isEmpty ||
         taskDescription.isEmpty ||
@@ -123,7 +126,8 @@ class _AddTaskPageState extends State<AddTaskPage> {
       return;
     }
 
-    if (_startDate!.isAfter(_dueDate!)) {
+    if (_startDate!.isAfter(_dueDate!) || 
+      (taskStartDate!.compareTo(taskDueDate!) == 0 && (60 * _startTime!.hour + _startTime!.minute) > (60 *_dueTime!.hour + _dueTime!.minute))) {
       AppAlerts.showSnackBar(context, "Az esemény nem kezdőthet később a határidőnél!");
       return;
     }
@@ -134,7 +138,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
 
       // Scheduling notification for task
       final scheduledDate = DateTime.parse('$taskStartDate');
-      final timeParts = _startTime!.split(':');
+      final timeParts = taskStartTime.split(':');
       final scheduledTime = TimeOfDay(
         hour: int.parse(timeParts[0]),
         minute: int.parse(timeParts[1]),
@@ -162,9 +166,9 @@ class _AddTaskPageState extends State<AddTaskPage> {
         'description': taskDescription,
         'location': taskLocation,
         'startDate': taskStartDate,
-        'startTime': _startTime,
+        'startTime': taskStartTime,
         'dueDate': taskDueDate,
-        'dueTime': _dueTime,
+        'dueTime': taskDueTime,
         'category': _selectedCategory,
         'difficulty': _selectedDifficulty,
         'notificationId': docRef.id.hashCode,
@@ -414,9 +418,9 @@ class _AddTaskPageState extends State<AddTaskPage> {
   Widget _buildDateTimePicker(
     BuildContext context,
     DateTime? date,
-    String? time,
+    TimeOfDay? time,
     ValueChanged<DateTime> onDatePicked,
-    ValueChanged<String> onTimePicked,
+    ValueChanged<TimeOfDay> onTimePicked,
   ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -450,7 +454,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildDateTimeText(date?.toIso8601String().substring(0, 10)),
-            _buildDateTimeText(time),
+            _buildDateTimeText(_formatTimeOfDay(time!)),
           ],
         ),
       ],
