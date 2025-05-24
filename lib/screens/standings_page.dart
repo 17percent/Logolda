@@ -26,7 +26,7 @@ class _StandingsPageState extends State<StandingsPage> {
     _fetchUsers();
   }
 
-  Future _fetchUsers() async {
+  Future<void> _fetchUsers() async {
     try {
       QuerySnapshot snapshot = await _firestore.collection('Users').get();
       setState(() {
@@ -36,7 +36,7 @@ class _StandingsPageState extends State<StandingsPage> {
         };
       });
     } catch (e) {
-      print('Error fetching users: $e');
+      print('Hiba: $e');
     }
   }
 

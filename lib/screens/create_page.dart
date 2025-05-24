@@ -68,7 +68,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
 
   Future<void> fetchCategories() async {
     try {
-      final QuerySnapshot snapshot = await FirebaseFirestore.instance
+      final QuerySnapshot snapshot = await _firestore
           .collection('Categories')
           .where('userId', isEqualTo: _authService.getLoggedInUser()?.uid)
           .get();
@@ -78,7 +78,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
         _isLoadingCategories = false; // Update loading state
       });
     } catch (e) {
-      AppAlerts.showSnackBar(context, 'Error fetching categories: $e');
+      AppAlerts.showSnackBar(context, 'Hiba: $e');
       setState(() {
         _isLoadingCategories = false; // Stop loading spinner even on error
       });
@@ -88,7 +88,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
   Future<void> fetchDifficulties() async {
     try {
       final QuerySnapshot snapshot =
-          await FirebaseFirestore.instance.collection('Difficulties').get();
+          await _firestore.collection('Difficulties').get();
       setState(() {
         _difficulties = snapshot.docs
             .map((doc) =>
@@ -100,7 +100,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
         _isLoadingDifficulties = false; // Update loading state
       });
     } catch (e) {
-      AppAlerts.showSnackBar(context, 'Error fetching difficulties: $e');
+      AppAlerts.showSnackBar(context, 'Hiba: $e');
       setState(() {
         _isLoadingDifficulties = false; // Stop loading spinner even on error
       });
@@ -128,7 +128,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
 
     if (_startDate!.isAfter(_dueDate!) || 
       (taskStartDate!.compareTo(taskDueDate!) == 0 && (60 * _startTime!.hour + _startTime!.minute) > (60 *_dueTime!.hour + _dueTime!.minute))) {
-      AppAlerts.showSnackBar(context, "Az esemény nem kezdőthet később a határidőnél!");
+      AppAlerts.showSnackBar(context, "Az esemény nem kezdődhet később a határidőnél!");
       return;
     }
 
@@ -155,7 +155,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
           id: docRef.id.hashCode,
           title: taskTitle,
           body:
-              'Hamarosan kezdődik az esemény! Tekintsd meg az alkalmazásban! ',
+              'Hamarosan kezdődik az esemény! Tekintsd meg az alkalmazásban!',
           scheduledDate: scheduledDateTime);
 
       // Adding task to Firestore
@@ -182,7 +182,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
         AppAlerts.showSnackBar(context, "Sikeres létrehozás!");
       }
     } catch (e) {
-      AppAlerts.showSnackBar(context, 'Failed to add task: $e');
+      AppAlerts.showSnackBar(context, 'Hiba: $e');
     }
   }
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:logolda/util/colors.dart';
 import 'package:logolda/util/styles.dart';
+import 'package:logolda/util/alerts.dart';
 import 'package:logolda/firebase/auth_handler.dart';
 
 class LoginPage extends StatefulWidget {
@@ -25,25 +26,17 @@ class _LoginPageState extends State<LoginPage> {
 
       if (user != null) {
         if (mounted) {
-          // Taking user to Home page
           Navigator.pushReplacementNamed(context, '/home');
-          // Sending info to screen
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Sikeres belépés!")),
-          );
+          AppAlerts.showSnackBar(context, "Sikeres belépés!");
         }
       } else {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Sikertelen belépés!")),
-          );
+          AppAlerts.showSnackBar(context, "Sikertelen belépés!");
         }
       }
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error: ${e.toString()}")),
-        );
+      if (mounted) { 
+        AppAlerts.showSnackBar(context, "Error: ${e.toString()}");
       }
     }
   }
@@ -207,14 +200,13 @@ class _LoginPageState extends State<LoginPage> {
           ),
           TextButton(
             onPressed: () {
-              Navigator.pushNamed(
-                  context, '/signup'); // Navigate to sign-up page
+              Navigator.pushNamed(context, '/signup'); // User átirányítása a regisztrációs oldalra
             },
             child: const Text(
               "Regisztrálok",
               style: TextStyle(fontSize: 20, color: AppColors.orangePeel),
-            ),
-          ),
+            ), // Text
+          ), // TextButton
         ],
       ),
     );

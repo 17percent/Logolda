@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:logolda/util/alerts.dart';
 import 'package:logolda/util/colors.dart';
 import 'package:logolda/firebase/auth_handler.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -22,6 +23,7 @@ class _SignupPageState extends State<SignupPage> {
   bool _obscureText = true;
 
   void _register() async {
+
     final username = _usernameController.text;
     final email = _emailController.text;
     final password = _passwordController.text;
@@ -30,38 +32,23 @@ class _SignupPageState extends State<SignupPage> {
     try {
       if (password.length < 6) {
         // Password too short
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text(
-                  "A megadott jelszónak legalább 6 karakter hosszúnak kell lennie!")),
-        );
+        AppAlerts.showSnackBar(context, "A jelszónak legalább 6 karakter hosszúnak kell lennie!");
       } else if (password != passwordAgain) {
         // Passwords don't match
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("A jelszavak nem egyeznek!")),
-        );
-      } else if (username.isEmpty || email.isEmpty || password.isEmpty) {
+        AppAlerts.showSnackBar(context, "A jelszavak nem egyeznek!");
+      } else if (username.isEmpty||email.isEmpty||password.isEmpty) {
         // Empty fields
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Minden mező kitöltése kötelező!")),
-        );
-      } else if (!email.contains('@') || !email.contains('.')) {
+        AppAlerts.showSnackBar(context, "Minden mező kitöltése kötelező!");
+      } else if (!RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$').hasMatch(email)) {
         // Invalid email
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Érvénytelen e-mail cím!")),
-        );
+        AppAlerts.showSnackBar(context, "Érvénytelen email cím!");
       } else if (username.length > 9) {
         // Username too long
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content:
-                  Text('A felhasználónév maximum 9 karakter hosszú lehet!')),
+        AppAlerts.showSnackBar(context, "A felhasználónév maximum 9 karakter hosszú lehet!",
         );
       } else {
         // Register user
-        final user =
-            await _authService.registerWithEmailPassword(email, password);
-
+        final user = await _authService.registerWithEmailPassword(email, password);
         if (user != null) {
           if (mounted) {
             // Save user data to Firestore
@@ -77,24 +64,18 @@ class _SignupPageState extends State<SignupPage> {
               // Taking user back to login
               Navigator.pushNamed(context, '/');
               // Sending info to screen
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Sikeres regisztráció!")),
-              );
+              AppAlerts.showSnackBar(context, "Sikeres regisztráció!");
             }
           }
         } else {
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Sikertelen regisztráció!")),
-            );
+            AppAlerts.showSnackBar(context, "Sikertelen regisztráció!");
           }
         }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error: ${e.toString()}")),
-        );
+        AppAlerts.showSnackBar(context, "Hiba történt: ${e.toString()}");
       }
     }
   }

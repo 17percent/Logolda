@@ -20,7 +20,7 @@ class _HomePageState extends State<HomePage> {
   final AuthService _authService = AuthService();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  String? _selectedFilter;
+  String? _selectedFilter = 'Dátum';
 
   late Future<List<Task>> _userTasks;
   late Map<String, List<Task>> _categorizedTasksByDate = {};
@@ -74,9 +74,9 @@ class _HomePageState extends State<HomePage> {
           .map((doc) => Task.fromMap(doc.data(), doc.id))
           .toList();
     } catch (e) {
-        if (mounted) {
-          AppAlerts.showSnackBar(context, 'Error fetching tasks: $e');
-        }
+      if (mounted) {
+        AppAlerts.showSnackBar(context, 'Hiba: $e');
+      }
       return [];
     }
   }
@@ -121,7 +121,7 @@ class _HomePageState extends State<HomePage> {
           pastTasks.add(task);
         }
       } catch (e) {
-        AppAlerts.showSnackBar(context, 
+        AppAlerts.showSnackBar(context,
             "Invalid date format for task '${task.title}': $startDateString");
       }
     }
@@ -164,6 +164,7 @@ class _HomePageState extends State<HomePage> {
         categorizedTasks[diff] = [task];
       }
     }
+    // TODO: Sort the list by difficulty level (New model: taskDiff)
     return categorizedTasks;
   }
 
@@ -180,43 +181,49 @@ class _HomePageState extends State<HomePage> {
             Container(
                 margin: const EdgeInsets.fromLTRB(30, 10, 30, 30),
                 child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Szűrés',
-                    style: TextStyle(
-                        color: AppColors.antiFlashWhite, fontSize: 24)),
-                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _buildActionButtons(
-                      const Icon(Icons.calendar_month_rounded, color: AppColors.antiFlashWhite, size: 36),
-                      () {
-                      setState(() {
-                        _selectedFilter = 'Dátum';
-                      });
-                      },
-                    ),
-                    const SizedBox(width: 10),
-                    _buildActionButtons(
-                      const Icon(Icons.category_rounded, color: AppColors.antiFlashWhite, size: 36),
-                      () {
-                      setState(() {
-                        _selectedFilter = 'Kategória';
-                      });
-                      },
-                    ),
-                    const SizedBox(width: 10),
-                    _buildActionButtons(
-                      const Icon(Icons.speed_rounded, color: AppColors.antiFlashWhite, size: 36),
-                      () {
-                      setState(() {
-                        _selectedFilter = 'Nehézség';
-                      });
-                      },
+                    const Text('Szűrés',
+                        style: TextStyle(
+                            color: AppColors.antiFlashWhite, fontSize: 24)),
+                    Row(
+                      children: [
+                        _buildFilterActionButtons(
+                          const Icon(Icons.calendar_month_rounded,
+                              color: AppColors.antiFlashWhite, size: 36),
+                          () {
+                            setState(() {
+                              _selectedFilter = 'Dátum';
+                            });
+                          },
+                          'Dátum',
+                        ),
+                        const SizedBox(width: 10),
+                        _buildFilterActionButtons(
+                          const Icon(Icons.category_rounded,
+                              color: AppColors.antiFlashWhite, size: 36),
+                          () {
+                            setState(() {
+                              _selectedFilter = 'Kategória';
+                            });
+                          },
+                          'Kategória',
+                        ),
+                        const SizedBox(width: 10),
+                        _buildFilterActionButtons(
+                          const Icon(Icons.speed_rounded,
+                              color: AppColors.antiFlashWhite, size: 36),
+                          () {
+                            setState(() {
+                              _selectedFilter = 'Nehézség';
+                            });
+                          },
+                          'Nehézség',
+                        ),
+                      ],
                     ),
                   ],
-                ),
-              ],
-            )),
+                )),
             FutureBuilder<List<Task>>(
               future: _userTasks,
               builder: (context, snapshot) {
@@ -277,7 +284,8 @@ class _HomePageState extends State<HomePage> {
                   return _buildTaskCategories(_categorizedTasksByCategory);
                 } else if (_selectedFilter == 'Nehézség') {
                   return _buildTaskCategories(_categorizedTasksByDiff);
-                } else { // Default behaviour
+                } else {
+                  // Default behaviour
                   return _buildTaskCategories(_categorizedTasksByDate);
                 }
               },
@@ -384,7 +392,6 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-}
 
 Widget _buildActionButtons(Icon icon, Function onPressed) {
   return Column(
@@ -399,6 +406,39 @@ Widget _buildActionButtons(Icon icon, Function onPressed) {
       ),
     ],
   );
+}
+
+Widget _buildFilterActionButtons(Icon icon, Function onPressed, String type) {
+  final isSelected = _selectedFilter == type; // Check if this button is selected
+  return Column(
+    children: [
+      Container(
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: isSelected ? AppColors.springBud : Colors.transparent, // Highlight if selected
+            width: 3,
+          ),
+          borderRadius: BorderRadius.circular(18),
+          color: AppColors.coolGrey,
+          boxShadow: [
+            BoxShadow(
+              blurRadius: 10,
+              blurStyle: BlurStyle.normal,
+              color: Colors.black.withOpacity(0.8),
+              offset: const Offset(0, 5),
+              spreadRadius: 0,
+            )
+          ],
+        ),
+        child: IconButton(
+          icon: icon,
+          onPressed: onPressed as void Function()?,
+          style: AppStyles.customButtonStyle(AppColors.coolGrey),
+        ),
+      ),
+    ],
+  );
+}
 }
 
 class TaskCategorySection extends StatefulWidget {
@@ -467,7 +507,9 @@ class _TaskCategorySectionState extends State<TaskCategorySection> {
                         context,
                         MaterialPageRoute(
                             builder: (context) => TaskDetailsPage(
-                                task: task, title: widget.title, page: '/home')),
+                                task: task,
+                                title: widget.title,
+                                page: '/home')),
                       );
                     },
                   ),

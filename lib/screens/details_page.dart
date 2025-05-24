@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:logolda/screens/modify_page.dart';
 import 'package:logolda/util/colors.dart';
 import 'package:logolda/util/styles.dart';
+import 'package:logolda/util/alerts.dart';
 import 'package:logolda/models/task.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:logolda/firebase/auth_handler.dart';
@@ -236,51 +237,44 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
     );
   }
 
-  void _showSnackBar(String message) {
-    if (mounted) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(message)));
-    }
-  }
-
   // Mark task as done
   Future<void> markTaskAsDone(String taskId) async {
     try {
       await _firestore.collection('Tasks').doc(taskId).update({
-        'isDone': true,
+        'isDone': true
       });
       await _notiService.cancelNotification(widget.task.notificationId);
       if (mounted) {
         Navigator.pushNamedAndRemoveUntil(
             context, _page, (Route<dynamic> route) => false);
       }
-      _showSnackBar("Sikeres archiválás!");
+      AppAlerts.showSnackBar(context, "Sikeres archiválás!");
     } catch (e) {
-      _showSnackBar('Sikertelen archiválás: $e');
+      AppAlerts.showSnackBar(context, 'Sikertelen archiválás: $e');
     }
   }
 
   num calculateUserScore(String desc) {
     final smog = _textAnalyticsService.calculateSMOGIndex(desc);
     final cl = _textAnalyticsService.calculateColemanLiauIndex(desc);
-    final diffScore = _difficultiesAndScores[_task.difficulty] as num;
-    final weight = (smog + cl) / 2;
+    final weight = _difficultiesAndScores[_task.difficulty] as num;
+    final diffScore = (smog + cl) / 2;
     final finalScore = diffScore * weight as num;
     return finalScore;
   }
 
   Future<void> updateUserScore() async {
-    final userid = _authService.getLoggedInUser()?.uid;
+    final userId = _authService.getLoggedInUser()?.uid;
     var finalScore = calculateUserScore(_task.description);
     if (finalScore <= 0) {
       finalScore = _difficultiesAndScores[_task.difficulty] as num;
     }
     try {
-      await _firestore.collection('Users').doc(userid).update({
+      await _firestore.collection('Users').doc(userId).update({
         'seeds': FieldValue.increment(finalScore),
       });
     } catch (e) {
-      _showSnackBar('Error updating user score: $e');
+      AppAlerts.showSnackBar(context, 'Hiba: $e');
     }
   }
 
@@ -294,7 +288,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
         };
       });
     } catch (e) {
-      _showSnackBar('Error fetching difficulties: $e');
+      AppAlerts.showSnackBar(context, 'Error fetching difficulties: $e');
       setState(() {});
     }
   }
@@ -307,9 +301,9 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
         Navigator.pushNamedAndRemoveUntil(
             context, _page, (Route<dynamic> route) => false);
       }
-      _showSnackBar("Sikeres törlés!");
+      AppAlerts.showSnackBar(context, "Sikeres törlés!");
     } catch (e) {
-      _showSnackBar('Sikertelen törlés: $e');
+      AppAlerts.showSnackBar(context, 'Sikertelen törlés: $e');
     }
   }
 }

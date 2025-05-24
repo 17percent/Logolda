@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:logolda/util/colors.dart';
+import 'package:logolda/util/styles.dart';
 import 'package:logolda/firebase/auth_handler.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -104,7 +105,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               Container(
                                 alignment: Alignment.center,
                                 padding: const EdgeInsets.fromLTRB(24, 8, 24, 8),
-                                decoration: customBoxDeoration(
+                                decoration: AppStyles.customBoxDecoration(
                                     AppColors.antiFlashWhite, 18),
                                 child: Text(
                                   '${userData['rank']}',
@@ -125,7 +126,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 alignment: Alignment.center,
                                 padding:
                                     const EdgeInsets.fromLTRB(24, 8, 24, 8),
-                                decoration: customBoxDeoration(
+                                decoration: AppStyles.customBoxDecoration(
                                     AppColors.antiFlashWhite, 18),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -177,7 +178,7 @@ Widget buildTaskRows(Map<String, int> tasks) {
       return Container(
         margin: const EdgeInsets.fromLTRB(12, 10, 12, 10),
         padding: const EdgeInsets.all(16),
-        decoration: customBoxDeoration(getColorBasedOnStatus(entry.key), 18),
+        decoration: AppStyles.customBoxDecoration(AppStyles.getColorBasedOnStatus(entry.key), 18),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -199,38 +200,5 @@ Widget buildTaskRows(Map<String, int> tasks) {
         ),
       );
     }).toList(),
-  );
-}
-
-Color getColorBasedOnStatus(String status) {
-  switch (status) {
-    case 'Esedékes':
-      return AppColors.amethystPurple;
-    case 'Közelgő':
-      return AppColors.goldYellow;
-    case 'Függő':
-      return AppColors.orangePeel;
-    case 'Lejárt':
-      return AppColors.pantoneRed;
-    case 'Kész':
-      return AppColors.springBud;
-    default:
-      return AppColors.antiFlashWhite;
-  }
-}
-
-BoxDecoration customBoxDeoration(Color color, double radius) {
-  return BoxDecoration(
-    borderRadius: BorderRadius.circular(radius),
-    color: color,
-    boxShadow: [
-      BoxShadow(
-        blurRadius: 10,
-        blurStyle: BlurStyle.normal,
-        color: Colors.black.withOpacity(0.5),
-        offset: const Offset(0, 5),
-        spreadRadius: 0,
-      )
-    ],
   );
 }
