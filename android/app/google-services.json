@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "252614473099",
+    "project_id": "logolda",
+    "storage_bucket": "logolda.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:252614473099:android:cf50f56691653c5f28eb8e",
+        "android_client_info": {
+          "package_name": "com.example.logolda"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDTOSGNaFN2kekgW_5I5aX6NsMhbTT8ctc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
